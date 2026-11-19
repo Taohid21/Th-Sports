@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>TH Sports | Official Sports Store Bangladesh</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,500;0,600;0,700;0,800;1,800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #162d59;
+      --navy-deep: #0c1a36;
+      --orange: #f04e23;
+      --bg: #f5f7fb;
+      --surface: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+      --shadow-sm: 0 2px 10px rgba(15, 23, 42, 0.04);
+      --shadow-md: 0 10px 28px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Plus Jakarta Sans', 'Noto Sans Bengali', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding-bottom: 60px;
+      -webkit-font-smoothing: antialiased;
+      display: flex; flex-direction: column; min-height: 100vh;
+    }
+    @media (min-width: 992px) { body { padding-bottom: 0; } }
+    a { text-decoration: none; color: inherit; }
+    button { font-family: inherit; }
+
+    /* Top Loading Progress Bar */
+    .top-progress {
+      position: fixed; top: 0; left: 0; height: 2.5px; width: 0%;
+      background: linear-gradient(90deg, var(--orange), #ff7a52);
+      z-index: 999; transition: width 0.35s ease, opacity 0.3s ease;
+    }
+
+    /* Header */
+    .header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(12px);
+      height: 60px; border-bottom: 1px solid var(--border); padding: 0 16px;
+    }
+    .header-inner {
+      max-width: 1240px; margin: 0 auto; height: 100%;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .header-left { display: flex; align-items: center; gap: 18px; }
+    .icon-btn {
+      background: none; border: none; color: #1e293b; cursor: pointer;
+      position: relative; padding: 4px; display: inline-flex; align-items: center;
+      transition: color 0.18s, transform 0.15s;
+    }
+    .icon-btn:hover { color: var(--orange); }
+    .icon-btn:active { transform: scale(0.92); }
+    .icon-btn svg { width: 22px; height: 22px; stroke-width: 1.85; }
+
+    .cart-badge {
+      position: absolute; top: -3px; right: -6px;
+      background: var(--orange); color: #fff; font-size: 10px; font-weight: 700;
+      min-width: 17px; height: 17px; border-radius: 99px;
+      display: none; align-items: center; justify-content: center;
+      padding: 0 4px; border: 1.5px solid #fff;
+    }
+    .cart-badge.show { display: flex; }
+
+    /* Circular Brand Logo */
+    .brand-logo { display: flex; align-items: center; gap: 9px; }
+    .logo-circle {
+      width: 38px; height: 38px; border-radius: 50%; overflow: hidden;
+      border: 1.8px solid var(--orange); background: var(--navy);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(240, 78, 35, 0.2);
+    }
+    .logo-circle img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .logo-mono { color: #fff; font-size: 13px; font-weight: 800; letter-spacing: 0.5px; }
+    .brand-text-col { display: flex; flex-direction: column; line-height: 1; }
+    .brand-title { font-size: 19px; font-weight: 800; font-style: italic; letter-spacing: -0.5px; color: var(--navy); }
+    .brand-sub { font-size: 8px; font-weight: 700; letter-spacing: 3px; color: var(--orange); text-align: right; margin-top: 2px; }
+
+    /* Search Drawer */
+    .search-bar-wrap {
+      display: none; background: #fff; padding: 12px 16px;
+      border-bottom: 1px solid var(--border); position: sticky; top: 60px; z-index: 99;
+      animation: slideDown 0.2s ease;
+    }
+    .search-bar-wrap.open { display: block; }
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+    .search-bar-inner { max-width: 1240px; margin: 0 auto; display: flex; gap: 8px; }
+    .search-input {
+      flex: 1; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 8px;
+      font-size: 14px; outline: none; transition: border-color 0.2s;
+    }
+    .search-input:focus { border-color: var(--navy); }
+    .search-close {
+      background: var(--navy); color: #fff; border: none; padding: 0 16px;
+      border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer;
+    }
+
+    /* Main Content */
+    .container { max-width: 1240px; width: 100%; margin: 0 auto; padding: 14px 14px 28px; flex: 1; }
+
+    /* Banner Slider */
+    .slider-wrap {
+      position: relative; border-radius: 14px; overflow: hidden;
+      background: linear-gradient(135deg, #0b1630 0%, #162d59 100%);
+      aspect-ratio: 16 / 7; max-height: 400px; box-shadow: var(--shadow-md);
+    }
+    @media (max-width: 640px) { .slider-wrap { aspect-ratio: 16 / 8.2; border-radius: 12px; } }
+    .slides { display: flex; height: 100%; transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1); }
+    .slide { min-width: 100%; height: 100%; position: relative; }
+    .slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .hero-default {
+      width: 100%; height: 100%; padding: 24px; display: flex; flex-direction: column; justify-content: center;
+      background: radial-gradient(circle at 85% 25%, rgba(240,78,35,0.28), transparent 55%), linear-gradient(135deg, #0b1630 0%, #162d59 100%);
+      color: #fff;
+    }
+    .hero-default h2 { font-size: clamp(20px, 4vw, 34px); font-weight: 800; line-height: 1.2; letter-spacing: -0.5px; }
+    .hero-default p { font-size: clamp(12px, 2vw, 14.5px); color: #cbd5e1; margin: 8px 0 14px; }
+    .hero-cta { display: inline-block; width: fit-content; background: var(--orange); color: #fff; font-size: 12px; font-weight: 700; padding: 7px 16px; border-radius: 99px; }
+
+    .slider-dots {
+      position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+      background: rgba(22, 45, 89, 0.9); padding: 5px 12px; border-radius: 99px;
+      display: flex; align-items: center; gap: 8px; backdrop-filter: blur(4px);
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--orange); cursor: pointer; transition: all 0.25s; opacity: 0.75; }
+    .dot.active { background: #ffffff; opacity: 1; transform: scale(1.2); }
+
+    /* Section Title */
+    .section-title { text-align: center; font-size: 22px; font-weight: 700; color: var(--navy); margin: 22px 0 14px; }
+
+    /* Category Pills */
+    .cat-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 20px; }
+    .cat-pill {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: #fff; border: 1px solid #dce2ec; color: #334155;
+      padding: 8px 14px; border-radius: 8px; font-size: 13.5px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 2px rgba(15,23,42,0.03);
+    }
+    .cat-pill svg { width: 15px; height: 15px; stroke-width: 1.9; color: #64748b; }
+    .cat-pill img { width: 18px; height: 18px; object-fit: contain; border-radius: 3px; }
+    .cat-pill:hover { border-color: var(--navy); color: var(--navy); transform: translateY(-1px); }
+    .cat-pill.active { background: var(--navy); color: #fff; border-color: var(--navy); box-shadow: 0 4px 12px rgba(22,45,89,0.22); }
+    .cat-pill.active svg { color: #fff; }
+
+    /* Product Grid & Stagger Animation */
+    .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    @media (min-width: 768px) { .product-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; } }
+    @media (min-width: 1024px) { .product-grid { grid-template-columns: repeat(4, 1fr); gap: 18px; } }
+
+    .product-card {
+      background: var(--surface); border-radius: 12px; border: 1px solid #edf0f5;
+      box-shadow: var(--shadow-sm); overflow: hidden; display: flex; flex-direction: column;
+      position: relative; transition: transform 0.22s ease, box-shadow 0.22s ease;
+      animation: fadeUp 0.4s ease both;
+    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .product-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+
+    .badge-stack { position: absolute; top: 10px; left: 10px; z-index: 2; display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+    .badge { background: var(--navy); color: #fff; font-size: 10.5px; font-weight: 600; padding: 3px 8px; border-radius: 4px; }
+    .badge-discount { background: var(--navy-deep); }
+
+    .quick-cart-btn {
+      position: absolute; top: 9px; right: 9px; z-index: 2;
+      background: transparent; border: none; width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      color: #64748b; cursor: pointer; transition: color 0.18s, transform 0.15s;
+    }
+    .quick-cart-btn:hover { color: var(--orange); transform: scale(1.12); }
+    .quick-cart-btn svg { width: 19px; height: 19px; stroke-width: 1.8; }
+
+    .prod-img-box {
+      width: 100%; aspect-ratio: 1 / 1; background: #fff;
+      display: flex; align-items: center; justify-content: center; padding: 14px; overflow: hidden;
+    }
+    .prod-img-box img { width: 100%; height: 100%; object-fit: contain; transition: transform 0.35s ease; }
+    .product-card:hover .prod-img-box img { transform: scale(1.05); }
+
+    .prod-body { padding: 6px 12px 13px; display: flex; flex-direction: column; flex: 1; }
+    .prod-title {
+      font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.4;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+      min-height: 39px; margin-bottom: 6px;
+    }
+    .rating-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #475569; margin-bottom: 10px; }
+    .stars { color: var(--orange); font-size: 13px; letter-spacing: 1px; line-height: 1; }
+
+    .price-action-row { margin-top: auto; display: flex; align-items: flex-end; justify-content: space-between; gap: 6px; }
+    .price-col { display: flex; flex-direction: column; line-height: 1.25; }
+    .as-low { font-size: 11px; color: var(--muted); margin-bottom: 1px; }
+    .offer-price { font-size: 15.5px; font-weight: 700; color: var(--text); }
+    .reg-price { font-size: 12px; color: #334155; text-decoration: line-through; text-decoration-color: #ef4444; text-decoration-thickness: 1.5px; }
+
+    .order-mini-btn {
+      border: 1.4px solid var(--navy); color: var(--navy); background: #fff;
+      padding: 6px 10px; border-radius: 6px; font-size: 12.5px; font-weight: 600;
+      white-space: nowrap; transition: all 0.18s;
+    }
+    .order-mini-btn:hover { background: var(--navy); color: #fff; }
+
+    /* Ultra-Modern English Brand Footer (Zero Gap with Bottom Nav) */
+    .site-footer {
+      background: linear-gradient(180deg, #102145 0%, #0a152e 100%);
+      color: #cbd5e1;
+      padding: 36px 18px 24px;
+      border-top: 2px solid var(--orange);
+      margin-top: auto;
+    }
+    .footer-inner {
+      max-width: 1240px; margin: 0 auto;
+      display: grid; gap: 28px;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    }
+    .footer-brand { display: flex; align-items: center; gap: 11px; margin-bottom: 10px; }
+    .footer-brand .logo-circle { width: 44px; height: 44px; }
+    .footer-brand-name { font-size: 18px; font-weight: 800; font-style: italic; color: #fff; letter-spacing: -0.4px; }
+    .footer-brand-sub { font-size: 9px; font-weight: 700; letter-spacing: 2.5px; color: var(--orange); display: block; margin-top: 2px; }
+    .footer-desc { font-size: 13px; color: #94a3b8; line-height: 1.65; max-width: 280px; }
+
+    .footer-col h4 {
+      color: #ffffff; font-size: 13px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;
+    }
+    .footer-col a, .footer-col p {
+      font-size: 13px; color: #94a3b8; line-height: 1.9; display: block; transition: color 0.15s;
+    }
+    .footer-col a:hover { color: #ffffff; }
+    .footer-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .f-pill {
+      font-size: 11px; font-weight: 600; color: #e2e8f0;
+      background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
+      padding: 4px 10px; border-radius: 99px;
+    }
+    .footer-bottom {
+      max-width: 1240px; margin: 26px auto 0; padding-top: 16px;
+      border-top: 1px solid rgba(255,255,255,0.09);
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;
+      font-size: 12px; color: #64748b;
+    }
+
+    /* Side Drawer */
+    .drawer-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.55); z-index: 200; backdrop-filter: blur(3px); }
+    .drawer-overlay.open { display: block; }
+    .drawer {
+      position: fixed; top: 0; left: -290px; width: 280px; height: 100%;
+      background: #fff; z-index: 201; transition: left 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+      display: flex; flex-direction: column; padding: 18px 16px;
+    }
+    .drawer.open { left: 0; }
+    .drawer-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 14px; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
+    .drawer-link { padding: 11px 10px; border-radius: 8px; font-weight: 600; font-size: 14.5px; color: var(--navy); display: flex; align-items: center; gap: 10px; cursor: pointer; }
+    .drawer-link:hover { background: var(--bg); }
+
+    /* Bottom Nav (Mobile/Tablet - flush 60px) */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; height: 60px;
+      background: var(--navy); border-top: 1px solid rgba(255,255,255,0.08);
+      display: flex; justify-content: space-around; align-items: center; z-index: 150;
+    }
+    @media (min-width: 992px) { .bottom-nav { display: none; } }
+    .bnav-item {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      color: #ffffff; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; gap: 4px;
+      cursor: pointer; background: none; border: none; position: relative; min-width: 54px;
+    }
+    .bnav-item svg { width: 20px; height: 20px; stroke: var(--orange); stroke-width: 2; }
+    .bnav-item.active::after {
+      content: ""; position: absolute; top: -7px; width: 24px; height: 2.5px;
+      background: var(--orange); border-radius: 99px;
+    }
+    .bnav-badge {
+      position: absolute; top: -6px; right: -8px; background: var(--orange); color: #fff;
+      font-size: 9.5px; font-weight: 700; min-width: 16px; height: 16px; border-radius: 99px;
+      display: flex; align-items: center; justify-content: center; padding: 0 4px;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 74px; left: 50%; transform: translateX(-50%) translateY(16px);
+      background: var(--navy-deep); color: #fff; padding: 10px 18px; border-radius: 99px;
+      font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none;
+      transition: all 0.25s; z-index: 300; box-shadow: var(--shadow-md); white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* Skeleton Loader */
+    .skel-card { background: #fff; border-radius: 12px; padding: 12px; height: 270px; border: 1px solid #edf0f5; display: flex; flex-direction: column; gap: 10px; }
+    .skel-box { background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: 8px; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .empty-state { grid-column: 1 / -1; text-align: center; padding: 48px 16px; color: var(--muted); }
+  </style>
+</head>
+<body>
+
+  <div class="top-progress" id="topProgress"></div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-left">
+        <button class="icon-btn" id="menuBtn" aria-label="Menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <button class="icon-btn" id="searchToggleBtn" aria-label="Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        </button>
+        <a href="checkout.html?mode=cart" class="icon-btn" aria-label="Cart">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.5 12h11l2-8H6"/></svg>
+          <span class="cart-badge" id="topCartCount">0</span>
+        </a>
+      </div>
+
+      <a href="index.html" class="brand-logo">
+        <div class="logo-circle">
+          <img class="brand-logo-img" src="https://www.pasteboard.co/WcF3Wq2GMjiY.jpg" alt="TH"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+          <span class="logo-mono" style="display:none;">TH</span>
+        </div>
+        <div class="brand-text-col">
+          <span class="brand-title">TH SPORTS</span>
+          <span class="brand-sub">BANGLADESH</span>
+        </div>
+      </a>
+    </div>
+  </header>
+
+  <!-- Search Bar -->
+  <div class="search-bar-wrap" id="searchWrap">
+    <div class="search-bar-inner">
+      <input type="text" id="searchInput" class="search-input" placeholder="Search rackets, jerseys, bats..." />
+      <button class="search-close" id="clearSearchBtn">Close</button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="container">
+    <section class="slider-wrap" id="bannerSection">
+      <div class="slides" id="bannerSlides">
+        <div class="slide">
+          <div class="hero-default">
+            <h2>TH SPORTS<br>ELEVATE YOUR GAME</h2>
+            <p>Your Destination for Quality Sportswear & Sporting Essentials.</p>
+            <span class="hero-cta">SHOP NOW</span>
+          </div>
+        </div>
+      </div>
+      <div class="slider-dots" id="bannerDots"></div>
+    </section>
+
+    <h2 class="section-title">খেলাধুলার সামগ্রী</h2>
+    <div class="cat-list" id="categoryList">
+      <button class="cat-pill active" data-cat="all">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+          <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+        </svg>
+        সকল সামগ্রী
+      </button>
+    </div>
+
+    <section class="product-grid" id="productGrid">
+      <div class="skel-card"><div class="skel-box" style="height:150px;"></div><div class="skel-box" style="height:18px;width:85%;"></div><div class="skel-box" style="height:26px;margin-top:auto;"></div></div>
+      <div class="skel-card"><div class="skel-box" style="height:150px;"></div><div class="skel-box" style="height:18px;width:85%;"></div><div class="skel-box" style="height:26px;margin-top:auto;"></div></div>
+      <div class="skel-card"><div class="skel-box" style="height:150px;"></div><div class="skel-box" style="height:18px;width:85%;"></div><div class="skel-box" style="height:26px;margin-top:auto;"></div></div>
+      <div class="skel-card"><div class="skel-box" style="height:150px;"></div><div class="skel-box" style="height:18px;width:85%;"></div><div class="skel-box" style="height:26px;margin-top:auto;"></div></div>
+    </section>
+  </main>
+
+  <!-- Modern English Brand Footer -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">
+          <div class="logo-circle">
+            <img class="brand-logo-img" src="https://www.pasteboard.co/WcF3Wq2GMjiY.jpg" alt="TH"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+            <span class="logo-mono" style="display:none;">TH</span>
+          </div>
+          <div>
+            <span class="footer-brand-name">TH SPORTS</span>
+            <span class="footer-brand-sub">BANGLADESH</span>
+          </div>
+        </div>
+        <p class="footer-desc">Your premier destination for authentic performance sports equipment, rackets, footwear, and official kits across Bangladesh.</p>
+      </div>
+
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <a href="index.html">Home</a>
+        <a href="checkout.html?mode=cart">Shopping Cart</a>
+        <a href="#bannerSection" id="footerDealsLink">Hot Deals</a>
+      </div>
+
+      <div class="footer-col">
+        <h4>Customer Promise</h4>
+        <p>Fast Nationwide Delivery</p>
+        <p>Cash on Delivery Available</p>
+        <div class="footer-badges">
+          <span class="f-pill">100% Authentic</span>
+          <span class="f-pill">Secure Checkout</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 TH Sports (thsports.shop). All rights reserved.</span>
+      <span>Engineered for Athletes</span>
+    </div>
+  </footer>
+
+  <!-- Side Drawer (No Admin Link) -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <aside class="drawer" id="sideDrawer">
+    <div class="drawer-header">
+      <div class="brand-logo">
+        <div class="logo-circle" style="width:32px;height:32px;">
+          <img class="brand-logo-img" src="https://www.pasteboard.co/WcF3Wq2GMjiY.jpg" alt="TH"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+          <span class="logo-mono" style="display:none;font-size:11px;">TH</span>
+        </div>
+        <strong style="color:var(--navy);font-size:16px;font-style:italic;">TH SPORTS</strong>
+      </div>
+      <button class="icon-btn" id="closeDrawerBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <a href="index.html" class="drawer-link">Home</a>
+    <a href="checkout.html?mode=cart" class="drawer-link">Shopping Cart</a>
+    <div id="drawerCategories"></div>
+  </aside>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <a href="index.html" class="bnav-item active" id="navHome">
+      <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>
+      <span>HOME</span>
+    </a>
+    <button class="bnav-item" id="navMenu">
+      <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      <span>MENU</span>
+    </button>
+    <a href="checkout.html?mode=cart" class="bnav-item">
+      <div style="position:relative;display:inline-flex;">
+        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.5 12h11l2-8H6"/></svg>
+        <span class="bnav-badge" id="bottomCartCount">0</span>
+      </div>
+      <span>CART</span>
+    </a>
+    <button class="bnav-item" id="navDeals">
+      <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 10-12h-7V2z"/></svg>
+      <span>DEALS</span>
+    </button>
+    <button class="bnav-item" id="navSearch">
+      <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <span>SEARCH</span>
+    </button>
+  </nav>
+
+  <div class="toast" id="toastBox"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-analytics.js";
+    import { getFirestore, collection, doc, getDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC7qQLrHIDOOxxSUcDsjR5EcHO4-0mByNQ",
+      authDomain: "th-sports-afd52.firebaseapp.com",
+      projectId: "th-sports-afd52",
+      storageBucket: "th-sports-afd52.firebasestorage.app",
+      messagingSenderId: "479595748038",
+      appId: "1:479595748038:web:0a0f2389d2b9f13aa215c7",
+      measurementId: "G-H8L744Y578"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    getAnalytics(app);
+    const db = getFirestore(app);
+
+    const prog = document.getElementById("topProgress");
+    prog.style.width = "45%";
+
+    let allProducts = [];
+    let selectedCategory = "all";
+    let dealsOnly = false;
+    let searchTerm = "";
+    let slideIndex = 0;
+    let totalSlides = 1;
+
+    const toBn = (n) => String(n).replace(/\d/g, d => "০১২৩৪৫৬৭৮৯"[d]);
+    const formatPrice = (n) => toBn(Number(n || 0).toLocaleString("en-US")) + "৳";
+    const esc = (s) => String(s || "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+    function showToast(msg) {
+      const t = document.getElementById("toastBox");
+      t.textContent = msg; t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 2000);
+    }
+
+    function updateCartBadge() {
+      const cart = JSON.parse(localStorage.getItem("th_cart") || "[]");
+      const count = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
+      const topEl = document.getElementById("topCartCount");
+      topEl.textContent = count; topEl.classList.toggle("show", count > 0);
+      document.getElementById("bottomCartCount").textContent = count;
+    }
+
+    async function loadStoreLogo() {
+      try {
+        const s = await getDoc(doc(db, "settings", "store"));
+        if (s.exists() && s.data().logoUrl) {
+          document.querySelectorAll(".brand-logo-img").forEach(img => {
+            img.src = s.data().logoUrl;
+            img.style.display = "block";
+            if (img.nextElementSibling) img.nextElementSibling.style.display = "none";
+          });
+        }
+      } catch (e) {}
+    }
+
+    async function loadBanners() {
+      try {
+        const snap = await getDocs(collection(db, "banners"));
+        const banners = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        if (!banners.length) return;
+        const slidesEl = document.getElementById("bannerSlides");
+        const dotsEl = document.getElementById("bannerDots");
+        slidesEl.innerHTML = banners.map(b => `<a href="${esc(b.link || '#')}" class="slide"><img src="${esc(b.image)}" alt="TH Sports" /></a>`).join("");
+        totalSlides = banners.length;
+        dotsEl.innerHTML = banners.map((_, i) => `<div class="dot ${i===0?'active':''}" data-idx="${i}"></div>`).join("");
+        dotsEl.querySelectorAll(".dot").forEach(dot => dot.addEventListener("click", () => goToSlide(Number(dot.dataset.idx))));
+        if (totalSlides > 1) setInterval(() => goToSlide((slideIndex + 1) % totalSlides), 4200);
+      } catch (e) {}
+    }
+
+    function goToSlide(idx) {
+      slideIndex = idx;
+      document.getElementById("bannerSlides").style.transform = `translateX(-${idx * 100}%)`;
+      document.querySelectorAll(".dot").forEach((d, i) => d.classList.toggle("active", i === idx));
+    }
+
+    async function loadCategories() {
+      try {
+        const snap = await getDocs(collection(db, "categories"));
+        const cats = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        const catList = document.getElementById("categoryList");
+        const drawerCats = document.getElementById("drawerCategories");
+
+        cats.forEach(cat => {
+          const btn = document.createElement("button");
+          btn.className = "cat-pill"; btn.dataset.cat = cat.id;
+          btn.innerHTML = `${cat.image ? `<img src="${esc(cat.image)}" alt="">` : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><circle cx="12" cy="12" r="9"/></svg>`} ${esc(cat.name)}`;
+          catList.appendChild(btn);
+
+          const dLink = document.createElement("div");
+          dLink.className = "drawer-link"; dLink.textContent = cat.name;
+          dLink.onclick = () => { selectCategory(cat.id); closeDrawer(); };
+          drawerCats.appendChild(dLink);
+        });
+
+        catList.addEventListener("click", (e) => {
+          const pill = e.target.closest(".cat-pill");
+          if (pill) selectCategory(pill.dataset.cat);
+        });
+      } catch (e) {}
+    }
+
+    function selectCategory(catId) {
+      selectedCategory = catId; dealsOnly = false;
+      document.querySelectorAll("#categoryList .cat-pill").forEach(p => p.classList.toggle("active", p.dataset.cat === catId));
+      renderProducts();
+    }
+
+    async function loadProducts() {
+      try {
+        const snap = await getDocs(query(collection(db, "products"), orderBy("createdAt", "desc")));
+        allProducts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderProducts();
+      } catch (e) {
+        try {
+          const snap = await getDocs(collection(db, "products"));
+          allProducts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+          renderProducts();
+        } catch (err) {
+          document.getElementById("productGrid").innerHTML = `<div class="empty-state">No products available right now.</div>`;
+        }
+      } finally {
+        prog.style.width = "100%";
+        setTimeout(() => prog.style.opacity = "0", 300);
+      }
+    }
+
+    function renderProducts() {
+      const grid = document.getElementById("productGrid");
+      const filtered = allProducts.filter(p => {
+        const matchCat = selectedCategory === "all" || p.categoryId === selectedCategory;
+        const matchSearch = !searchTerm || (p.name || "").toLowerCase().includes(searchTerm);
+        const reg = Number(p.regularPrice || 0), off = Number(p.offerPrice || reg);
+        const matchDeal = !dealsOnly || (reg > off);
+        return matchCat && matchSearch && matchDeal;
+      });
+
+      if (!filtered.length) {
+        grid.innerHTML = `<div class="empty-state">কোনো প্রোডাক্ট পাওয়া যায়নি।</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map((p, idx) => {
+        const reg = Number(p.regularPrice || 0), off = Number(p.offerPrice || reg);
+        const discountPct = reg > off ? Math.round(((reg - off) / reg) * 100) : 0;
+        const ratingCount = Number(p.reviewCount || 0), avgRating = Number(p.avgRating || 5);
+        const starsHtml = "★".repeat(Math.round(avgRating)) + "☆".repeat(5 - Math.round(avgRating));
+        const hasVariants = Array.isArray(p.variants) && p.variants.length > 0;
+        const imgUrl = p.mainImage || (p.gallery && p.gallery[0]) || "https://placehold.co/400x400/f8fafc/162d59?text=TH+SPORTS";
+
+        return `
+          <div class="product-card" style="animation-delay:${Math.min(idx * 45, 300)}ms">
+            <div class="badge-stack">
+              ${p.bestSeller ? `<span class="badge">Best Seller</span>` : ''}
+              ${discountPct > 0 ? `<span class="badge badge-discount">-${discountPct}%</span>` : ''}
+            </div>
+            <button class="quick-cart-btn" data-id="${p.id}" aria-label="Add to cart">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.5 12h11l2-8H6"/></svg>
+            </button>
+            <a href="checkout.html?id=${p.id}" class="prod-img-box">
+              <img src="${esc(imgUrl)}" alt="${esc(p.name)}" loading="lazy" />
+            </a>
+            <div class="prod-body">
+              <a href="checkout.html?id=${p.id}" class="prod-title">${esc(p.name)}</a>
+              <div class="rating-row">
+                <span class="stars">${starsHtml}</span>
+                <span>${toBn(ratingCount)} রিভিউস</span>
+              </div>
+              <div class="price-action-row">
+                <div class="price-col">
+                  ${hasVariants ? `<span class="as-low">As low as</span>` : ''}
+                  <span class="offer-price">${formatPrice(off)}</span>
+                  ${reg > off ? `<span class="reg-price">${formatPrice(reg)}</span>` : ''}
+                </div>
+                <a href="checkout.html?id=${p.id}" class="order-mini-btn">অর্ডার করুন</a>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      grid.querySelectorAll(".quick-cart-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          e.preventDefault();
+          const prod = allProducts.find(x => x.id === btn.dataset.id);
+          if (!prod) return;
+          const cart = JSON.parse(localStorage.getItem("th_cart") || "[]");
+          const price = Number(prod.offerPrice || prod.regularPrice || 0);
+          const defaultVar = prod.variants && prod.variants[0] ? prod.variants[0].name : "";
+          const existing = cart.find(c => c.id === prod.id && c.variant === defaultVar);
+          if (existing) existing.qty += 1;
+          else cart.push({ id: prod.id, name: prod.name, price, image: prod.mainImage || "", variant: defaultVar, qty: 1 });
+          localStorage.setItem("th_cart", JSON.stringify(cart));
+          updateCartBadge();
+          showToast("Added to Cart ✓");
+        });
+      });
+    }
+
+    const openDrawer = () => { document.getElementById("drawerOverlay").classList.add("open"); document.getElementById("sideDrawer").classList.add("open"); };
+    const closeDrawer = () => { document.getElementById("drawerOverlay").classList.remove("open"); document.getElementById("sideDrawer").classList.remove("open"); };
+    document.getElementById("menuBtn").onclick = openDrawer;
+    document.getElementById("navMenu").onclick = openDrawer;
+    document.getElementById("closeDrawerBtn").onclick = closeDrawer;
+    document.getElementById("drawerOverlay").onclick = closeDrawer;
+
+    const toggleSearch = () => {
+      const wrap = document.getElementById("searchWrap");
+      wrap.classList.toggle("open");
+      if (wrap.classList.contains("open")) document.getElementById("searchInput").focus();
+    };
+    document.getElementById("searchToggleBtn").onclick = toggleSearch;
+    document.getElementById("navSearch").onclick = toggleSearch;
+    document.getElementById("searchInput").oninput = (e) => { searchTerm = e.target.value.trim().toLowerCase(); renderProducts(); };
+    document.getElementById("clearSearchBtn").onclick = () => {
+      document.getElementById("searchInput").value = ""; searchTerm = "";
+      document.getElementById("searchWrap").classList.remove("open"); renderProducts();
+    };
+
+    const toggleDeals = () => {
+      dealsOnly = !dealsOnly;
+      document.getElementById("navDeals").classList.toggle("active", dealsOnly);
+      document.getElementById("navHome").classList.toggle("active", !dealsOnly);
+      renderProducts();
+      showToast(dealsOnly ? "Showing Hot Deals" : "Showing All Products");
+    };
+    document.getElementById("navDeals").onclick = toggleDeals;
+    document.getElementById("footerDealsLink").onclick = (e) => { e.preventDefault(); if (!dealsOnly) toggleDeals(); window.scrollTo({ top: 0, behavior: "smooth" }); };
+
+    updateCartBadge();
+    loadStoreLogo();
+    loadBanners();
+    loadCategories();
+    loadProducts();
+  </script>
+</body>
+</html>
