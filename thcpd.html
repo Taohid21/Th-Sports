@@ -1,0 +1,1691 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>TH Sports | Admin Control</title>
+  <link rel="icon" type="image/jpeg" href="https://gcdnb.pbrd.co/images/X64gpxh4sBU_.jpg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,500;0,600;0,700;0,800;1,800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #162d59;
+      --navy-dark: #0b1730;
+      --orange: #f04e23;
+      --bg: #f1f5f9;
+      --surface: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Plus Jakarta Sans', 'Noto Sans Bengali', sans-serif;
+      background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased;
+      padding-bottom: 72px;
+    }
+    @media (min-width: 992px) { body { padding-bottom: 24px; } }
+    button, input, select, textarea { font-family: inherit; }
+
+    .top-progress {
+      position: fixed; top: 0; left: 0; height: 2.5px; width: 0%;
+      background: linear-gradient(90deg, var(--orange), #ff7b54);
+      z-index: 999; transition: width 0.35s ease, opacity 0.3s ease;
+    }
+
+    /* Login */
+    .login-wrap {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      padding: 18px; background: radial-gradient(circle at top right, #1e3b75, #0b1730 70%);
+    }
+    .login-card {
+      background: #fff; padding: 32px 24px; border-radius: 18px; width: 100%; max-width: 370px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.35);
+    }
+    .brand-head { display: flex; align-items: center; gap: 11px; margin-bottom: 22px; }
+    .logo-circle {
+      width: 40px; height: 40px; border-radius: 50%; overflow: hidden;
+      border: 1.8px solid var(--orange); background: var(--navy);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .logo-circle img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Top Header */
+    .admin-layout { display: none; min-height: 100vh; }
+    .topbar {
+      background: var(--navy-dark); color: #fff; padding: 10px 14px;
+      display: flex; justify-content: space-between; align-items: center;
+      position: sticky; top: 0; z-index: 60; height: 56px;
+    }
+    .top-brand { display: flex; align-items: center; gap: 9px; }
+    .top-brand strong { font-size: 15.5px; font-style: italic; letter-spacing: -0.3px; }
+
+    /* Desktop Top Tabs (Hidden on Mobile, Bottom Nav used on Mobile) */
+    .desktop-tabs {
+      display: none; background: #fff; border-bottom: 1px solid var(--border);
+      padding: 0 16px; gap: 6px; position: sticky; top: 56px; z-index: 50;
+    }
+    @media (min-width: 992px) { .desktop-tabs { display: flex; } }
+    .tab-btn {
+      padding: 13px 14px; border: none; background: none; font-weight: 600; font-size: 13.5px;
+      color: var(--muted); cursor: pointer; white-space: nowrap;
+      border-bottom: 2.5px solid transparent; display: inline-flex; align-items: center; gap: 7px;
+    }
+    .tab-btn.active { color: var(--navy); border-bottom-color: var(--orange); }
+
+    /* Bottom Nav for Mobile */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; height: 62px;
+      background: var(--navy-dark); border-top: 1px solid rgba(255,255,255,0.1);
+      display: flex; justify-content: space-around; align-items: center; z-index: 100;
+    }
+    @media (min-width: 992px) { .bottom-nav { display: none; } }
+    .bnav-btn {
+      background: none; border: none; color: #94a3b8; font-size: 10px; font-weight: 700;
+      display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; padding: 4px 8px;
+    }
+    .bnav-btn svg { width: 20px; height: 20px; stroke-width: 2; }
+    .bnav-btn.active { color: #fff; }
+    .bnav-btn.active svg { stroke: var(--orange); }
+
+    .content { max-width: 1200px; margin: 0 auto; padding: 14px 12px 30px; }
+    .tab-panel { display: none; animation: fadeUp 0.22s ease; }
+    .tab-panel.active { display: block; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Cards & Controls */
+    .card {
+      background: var(--surface); border-radius: 14px; border: 1px solid var(--border);
+      padding: 16px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(15,23,42,0.03);
+    }
+    .card-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .card-head h3 { font-size: 15.5px; color: var(--navy); font-weight: 700; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
+    @media (min-width: 768px) { .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 14px; } }
+    .stat-card { background: #fff; padding: 14px; border-radius: 12px; border: 1px solid var(--border); }
+    .stat-card small { color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; }
+    .stat-card h2 { font-size: 22px; color: var(--navy); margin-top: 4px; font-weight: 800; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 768px) { .grid-2 { grid-template-columns: 1fr 1fr; } }
+
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; font-size: 12.5px; font-weight: 600; color: #334155; margin-bottom: 5px; }
+    .form-control {
+      width: 100%; padding: 9.5px 11px; border: 1.5px solid #cbd5e1; border-radius: 8px;
+      font-size: 13.5px; background: #fff; outline: none; transition: border-color 0.2s;
+    }
+    .form-control:focus { border-color: var(--navy); }
+
+    .btn {
+      padding: 8px 13px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;
+      font-size: 12.5px; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      text-decoration: none; transition: transform 0.12s, opacity 0.15s;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+    .btn-primary { background: var(--navy); color: #fff; }
+    .btn-accent { background: var(--orange); color: #fff; }
+    .btn-success { background: #16a34a; color: #fff; }
+    .btn-ghost { background: #e2e8f0; color: #0f172a; }
+    .btn-danger { background: #fee2e2; color: #dc2626; }
+    .btn-sm { padding: 6px 10px; font-size: 12px; }
+
+    /* Search & Filter Pills */
+    .search-row { display: flex; gap: 8px; margin-bottom: 10px; }
+    .filter-scroll {
+      display: flex; overflow-x: auto; gap: 6px; padding-bottom: 6px; margin-bottom: 10px;
+      scrollbar-width: none;
+    }
+    .filter-scroll::-webkit-scrollbar { display: none; }
+    .f-pill {
+      padding: 6px 12px; border-radius: 99px; border: 1px solid var(--border);
+      background: #fff; font-size: 12px; font-weight: 600; cursor: pointer; color: var(--muted); white-space: nowrap;
+    }
+    .f-pill.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+    /* Bulk Select Toolbar */
+    .bulk-toolbar {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+      gap: 8px; background: #fff; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border);
+      margin-bottom: 12px;
+    }
+    .bulk-actions-bar {
+      display: none; flex-wrap: wrap; gap: 6px; width: 100%; padding-top: 8px; border-top: 1px dashed var(--border);
+    }
+    .bulk-actions-bar.show { display: flex; }
+
+    /* 2-Column Mobile Order Grid */
+    .orders-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 9px;
+    }
+    @media (min-width: 768px) { .orders-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; } }
+    @media (min-width: 1024px) { .orders-grid { grid-template-columns: repeat(4, 1fr); gap: 14px; } }
+
+    .order-card {
+      background: #fff; border: 1.5px solid var(--border); border-radius: 12px; padding: 10px;
+      display: flex; flex-direction: column; gap: 6px; cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s; position: relative;
+    }
+    .order-card.selected { border-color: var(--orange); background: #fffaf8; }
+    .oc-top { display: flex; justify-content: space-between; align-items: center; gap: 4px; }
+    .oc-check-wrap { display: flex; align-items: center; gap: 6px; }
+    .oc-check { width: 17px; height: 17px; accent-color: var(--orange); cursor: pointer; }
+    .oc-id { font-size: 12.5px; font-weight: 800; color: var(--navy); }
+    .oc-name { font-size: 13px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .oc-phone { font-size: 11.5px; color: var(--muted); font-weight: 600; }
+    .oc-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 6px; border-top: 1px solid #f1f5f9; }
+    .oc-price { font-size: 13.5px; font-weight: 800; color: var(--orange); }
+    .oc-courier-tag { font-size: 10px; background: #ede9fe; color: #5b21b6; padding: 2px 6px; border-radius: 4px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+    .status-badge { padding: 2px 7px; border-radius: 99px; font-size: 10px; font-weight: 700; display: inline-block; white-space: nowrap; }
+    .st-Pending { background: #fef3c7; color: #92400e; }
+    .st-Confirmed { background: #dbeafe; color: #1e40af; }
+    .st-Ready { background: #ede9fe; color: #5b21b6; }
+    .st-Delivered { background: #dcfce7; color: #166534; }
+    .st-Returned { background: #ffedd5; color: #9a3412; }
+    .st-Manual { background: #e2e8f0; color: #334155; }
+    .st-Cancelled { background: #fee2e2; color: #991b1b; }
+
+    /* Sub-Page Overlay Views (Order Detail & Add Product Page) */
+    .subpage-view {
+      display: none; position: fixed; inset: 0; background: var(--bg); z-index: 200;
+      overflow-y: auto; padding-bottom: 30px; animation: slideLeft 0.2s ease;
+    }
+    .subpage-view.open { display: block; }
+    @keyframes slideLeft { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: translateX(0); } }
+    .subpage-header {
+      position: sticky; top: 0; z-index: 10; background: var(--navy-dark); color: #fff;
+      height: 54px; padding: 0 14px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .subpage-body { max-width: 820px; margin: 0 auto; padding: 14px 12px; }
+
+    /* Products Grid */
+    .prod-admin-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    @media (min-width: 768px) { .prod-admin-grid { grid-template-columns: repeat(4, 1fr); gap: 14px; } }
+    .pa-card {
+      background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 10px;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .pa-card img { width: 100%; aspect-ratio: 1/1; object-fit: contain; background: #f8fafc; border-radius: 8px; }
+    .pa-title { font-size: 13px; font-weight: 700; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 36px; }
+
+    /* Helpers */
+    .upload-row { display: flex; gap: 6px; align-items: center; }
+    .img-preview-mini { width: 38px; height: 38px; border-radius: 8px; border: 1px solid var(--border); object-fit: cover; flex-shrink: 0; background: #f8fafc; }
+    .gallery-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .g-chip { position: relative; width: 60px; height: 60px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .g-chip img { width: 100%; height: 100%; object-fit: cover; }
+    .g-chip button { position: absolute; top: 2px; right: 2px; background: #ef4444; color: #fff; border: none; width: 18px; height: 18px; border-radius: 50%; font-size: 11px; cursor: pointer; }
+
+    .variant-row {
+      display: grid; grid-template-columns: 2fr 50px 1fr 1fr auto; gap: 6px;
+      align-items: center; margin-bottom: 8px; background: #f8fafc; padding: 8px; border-radius: 8px; border: 1px solid var(--border);
+    }
+    @media (max-width: 600px) { .variant-row { grid-template-columns: 1fr 48px; } }
+
+    .switch-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 10px 12px; background: #f8fafc; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px;
+    }
+    .switch-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--orange); cursor: pointer; }
+
+    .subtab-pills { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 14px; }
+    .subtab-panel { display: none; }
+    .subtab-panel.active { display: block; }
+
+    .toast {
+      position: fixed; bottom: 74px; left: 50%; transform: translateX(-50%);
+      background: var(--navy-dark); color: #fff; padding: 10px 18px; border-radius: 99px;
+      font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity 0.25s; z-index: 400; white-space: nowrap;
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <div class="top-progress" id="topProgress"></div>
+
+  <!-- Login View (No Example Credentials) -->
+  <div class="login-wrap" id="loginWrap">
+    <div class="login-card">
+      <div class="brand-head">
+        <div class="logo-circle">
+          <img class="brand-logo-img" src="https://gcdnb.pbrd.co/images/X64gpxh4sBU_.jpg" alt="TH" />
+        </div>
+        <div>
+          <strong style="font-size:18px;font-style:italic;color:var(--navy);">TH SPORTS</strong>
+          <span style="display:block;font-size:11px;color:var(--muted);font-weight:700;">SECURE ADMIN LOGIN</span>
+        </div>
+      </div>
+      <form id="loginForm" autocomplete="off">
+        <div class="form-group">
+          <label>Admin Email</label>
+          <input type="email" id="loginEmail" class="form-control" required autocomplete="username" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="loginPass" class="form-control" required autocomplete="current-password" />
+        </div>
+        <button type="submit" class="btn btn-primary" id="loginBtn" style="width:100%;padding:11px;margin-top:6px;">Sign In</button>
+      </form>
+      <p id="loginErr" style="color:#dc2626;font-size:12px;margin-top:10px;"></p>
+    </div>
+  </div>
+
+  <!-- Admin Main Layout -->
+  <div class="admin-layout" id="adminLayout">
+    <header class="topbar">
+      <div class="top-brand">
+        <div class="logo-circle" style="width:34px;height:34px;">
+          <img class="brand-logo-img" src="https://gcdnb.pbrd.co/images/X64gpxh4sBU_.jpg" alt="TH" />
+        </div>
+        <strong>TH <span style="color:var(--orange)">SPORTS</span></strong>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <a href="index.html" target="_blank" class="btn btn-sm" style="background:rgba(255,255,255,0.14);color:#fff;">Store</a>
+        <button id="logoutBtn" class="btn btn-sm btn-accent">Logout</button>
+      </div>
+    </header>
+
+    <!-- Desktop Navigation -->
+    <nav class="desktop-tabs" id="desktopTabs">
+      <button class="tab-btn active" data-tab="dashboard">ড্যাশবোর্ড</button>
+      <button class="tab-btn" data-tab="orders">অর্ডার ম্যানেজমেন্ট</button>
+      <button class="tab-btn" data-tab="products">প্রোডাক্ট</button>
+      <button class="tab-btn" data-tab="media">ক্যাটাগরি, ব্যানার ও ভিডিও</button>
+      <button class="tab-btn" data-tab="settings">সেটিংস (কুরিয়ার ও পেমেন্ট)</button>
+    </nav>
+
+    <main class="content">
+      <!-- 1. DASHBOARD -->
+      <section class="tab-panel active" id="tab-dashboard">
+        <div class="stats-grid" id="statsGrid"></div>
+        <div class="card">
+          <div class="card-head"><h3>প্রোডাক্ট সেলস রিপোর্ট</h3></div>
+          <div id="salesReportWrap" style="overflow-x:auto;"></div>
+        </div>
+      </section>
+
+      <!-- 2. ORDERS MANAGEMENT -->
+      <section class="tab-panel" id="tab-orders">
+        <div class="search-row">
+          <input type="text" id="orderSearchInput" class="form-control" placeholder="সার্চ: অর্ডার ID (TH01), ফোন, নাম, ট্র্যাকিং..." />
+          <button class="btn btn-primary" id="syncAllCourierBtn" title="Sync Live Status">Sync Live</button>
+        </div>
+
+        <div class="filter-scroll" id="orderFilterPills">
+          <button class="f-pill active" data-st="All">All</button>
+          <button class="f-pill" data-st="Today">Today</button>
+          <button class="f-pill" data-st="Pending">Pending</button>
+          <button class="f-pill" data-st="Confirmed">Confirmed</button>
+          <button class="f-pill" data-st="Ready for Delivery">Ready for Delivery</button>
+          <button class="f-pill" data-st="Delivered">Delivered</button>
+          <button class="f-pill" data-st="Returned">Returned</button>
+          <button class="f-pill" data-st="Manual">Manual</button>
+          <button class="f-pill" data-st="Cancelled">Cancelled</button>
+        </div>
+
+        <!-- Bulk Select & Actions -->
+        <div class="bulk-toolbar">
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;cursor:pointer;">
+            <input type="checkbox" id="selectAllOrders" style="width:17px;height:17px;accent-color:var(--orange);" />
+            সব সিলেক্ট (<span id="selectedCountLabel">0</span>)
+          </label>
+          <span style="font-size:12px;color:var(--muted);" id="filteredOrdersCount"></span>
+
+          <div class="bulk-actions-bar" id="bulkActionsBar">
+            <select id="bulkStatusSelect" class="form-control" style="width:auto;padding:6px 8px;font-size:12px;">
+              <option value="">-- স্ট্যাটাস বদলান --</option>
+              <option value="Pending">Pending</option>
+              <option value="Confirmed">Confirmed</option>
+              <option value="Ready for Delivery">Ready for Delivery</option>
+              <option value="Delivered">Delivered</option>
+              <option value="Returned">Returned</option>
+              <option value="Manual">Manual</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+            <button class="btn btn-primary btn-sm" id="applyBulkStatusBtn">Apply</button>
+            <button class="btn btn-accent btn-sm" id="bulkSteadfastBtn">Send Steadfast</button>
+            <button class="btn btn-success btn-sm" id="bulkPathaoBtn">Send Pathao</button>
+          </div>
+        </div>
+
+        <div class="orders-grid" id="ordersGrid"></div>
+      </section>
+
+      <!-- 3. PRODUCTS -->
+      <section class="tab-panel" id="tab-products">
+        <div class="card" style="padding:12px 14px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+            <div>
+              <h3 style="font-size:15.5px;color:var(--navy);">সকল প্রোডাক্ট (<span id="totalProdCount">0</span>টি)</h3>
+              <small style="color:var(--muted);font-size:11.5px;">নতুন প্রোডাক্ট যোগ করতে পাশের বাটনে চাপুন</small>
+            </div>
+            <button class="btn btn-accent" id="openAddProductBtn">+ Add Product</button>
+          </div>
+        </div>
+        <div class="prod-admin-grid" id="productsGrid"></div>
+      </section>
+
+      <!-- 4. MEDIA (Categories, Banners, Videos, Reviews) -->
+      <section class="tab-panel" id="tab-media">
+        <div class="subtab-pills" id="mediaSubTabs">
+          <button class="f-pill active" data-sub="categories">ক্যাটাগরি</button>
+          <button class="f-pill" data-sub="banners">ব্যানার (Hero/Promo)</button>
+          <button class="f-pill" data-sub="videos">ভিডিও গ্যালারি</button>
+          <button class="f-pill" data-sub="reviews">রিভিউ</button>
+        </div>
+
+        <!-- Categories -->
+        <div class="subtab-panel active" id="sub-categories">
+          <div class="card">
+            <div class="card-head"><h3>নতুন ক্যাটাগরি</h3></div>
+            <div class="grid-2">
+              <div class="form-group"><label>ক্যাটাগরির নাম *</label><input type="text" id="catName" class="form-control" /></div>
+              <div class="form-group">
+                <label>আইকন/ইমেজ</label>
+                <div class="upload-row">
+                  <img id="catPrev" class="img-preview-mini" src="https://placehold.co/80x80/f1f5f9/94a3b8?text=CAT" alt="" />
+                  <input type="text" id="catImg" class="form-control" placeholder="Image URL" />
+                  <input type="file" id="catFile" accept="image/*" style="display:none;" />
+                  <button type="button" class="btn btn-primary btn-sm" id="btnUpCat" onclick="document.getElementById('catFile').click()">Upload</button>
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-primary" id="saveCatBtn">সেভ করুন</button>
+          </div>
+          <div class="card"><div class="card-head"><h3>ক্যাটাগরি লিস্ট</h3></div><div id="catTableWrap"></div></div>
+        </div>
+
+        <!-- Banners -->
+        <div class="subtab-panel" id="sub-banners">
+          <div class="card">
+            <div class="card-head"><h3>নতুন ব্যানার (Hero অথবা Promotional)</h3></div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label>ব্যানার ধরন</label>
+                <select id="banPlacement" class="form-control">
+                  <option value="hero">Top Hero Slider (বড় ব্যানার)</option>
+                  <option value="promo">Mid-Page Promotional Banner (অফার ব্যানার)</option>
+                </select>
+              </div>
+              <div class="form-group"><label>ক্লিক লিংক (ঐচ্ছিক)</label><input type="text" id="banLink" class="form-control" placeholder="https://..." /></div>
+            </div>
+            <div class="form-group">
+              <label>ব্যানার ইমেজ *</label>
+              <div class="upload-row">
+                <img id="banPrev" class="img-preview-mini" src="https://placehold.co/80x80/f1f5f9/94a3b8?text=BAN" alt="" />
+                <input type="text" id="banImg" class="form-control" placeholder="Image URL" />
+                <input type="file" id="banFile" accept="image/*" style="display:none;" />
+                <button type="button" class="btn btn-primary btn-sm" id="btnUpBan" onclick="document.getElementById('banFile').click()">Upload</button>
+              </div>
+            </div>
+            <button class="btn btn-primary" id="saveBannerBtn">ব্যানার যোগ করুন</button>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>সকল ব্যানার</h3></div>
+            <div id="bannersList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;"></div>
+          </div>
+        </div>
+
+        <!-- Videos -->
+        <div class="subtab-panel" id="sub-videos">
+          <div class="card">
+            <div class="card-head"><h3>নতুন ভিডিও আপলোড / লিংক</h3></div>
+            <div class="form-group"><label>ভিডিও টাইটেল *</label><input type="text" id="vidTitle" class="form-control" placeholder="যেমন: নতুন ট্যাপ টেনিস ব্যাট রিভিউ" /></div>
+            <div class="form-group">
+              <label>ভিডিও লিংক (YouTube / Shorts / Direct MP4) অথবা Upload *</label>
+              <div class="upload-row">
+                <input type="text" id="vidUrl" class="form-control" placeholder="https://youtube.com/... বা .mp4" />
+                <input type="file" id="vidFile" accept="video/*" style="display:none;" />
+                <button type="button" class="btn btn-accent btn-sm" id="btnUpVid" onclick="document.getElementById('vidFile').click()">Upload</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>কাস্টম থাম্বনেইল (ঐচ্ছিক - YouTube হলে অটো নিবে)</label>
+              <div class="upload-row">
+                <input type="text" id="vidThumb" class="form-control" placeholder="Thumbnail Image URL" />
+                <input type="file" id="vidThumbFile" accept="image/*" style="display:none;" />
+                <button type="button" class="btn btn-primary btn-sm" id="btnUpVidThumb" onclick="document.getElementById('vidThumbFile').click()">Upload</button>
+              </div>
+            </div>
+            <button class="btn btn-primary" id="saveVideoBtn">ভিডিও সেভ করুন</button>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>ভিডিও গ্যালারি (<span id="vidCount">0</span>)</h3></div>
+            <div id="videosList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;"></div>
+          </div>
+        </div>
+
+        <!-- Reviews -->
+        <div class="subtab-panel" id="sub-reviews">
+          <div class="card">
+            <div class="card-head"><h3>কাস্টমার রিভিউ</h3></div>
+            <div id="reviewsList"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. SETTINGS (Delivery, Couriers, Gateways, Store) -->
+      <section class="tab-panel" id="tab-settings">
+        <div class="card">
+          <div class="card-head"><h3>স্টোর ও ডেলিভারি চার্জ সেটিংস</h3></div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label>লোগো URL / Upload</label>
+              <div class="upload-row">
+                <img id="logoPrev" class="img-preview-mini" style="border-radius:50%;" src="https://gcdnb.pbrd.co/images/X64gpxh4sBU_.jpg" alt="" />
+                <input type="text" id="setLogoUrl" class="form-control" />
+                <input type="file" id="logoFile" accept="image/*" style="display:none;" />
+                <button type="button" class="btn btn-primary btn-sm" id="btnUpLogo" onclick="document.getElementById('logoFile').click()">Upload</button>
+              </div>
+            </div>
+            <div class="form-group"><label>WhatsApp নম্বর</label><input type="text" id="setWhatsapp" class="form-control" placeholder="8801..." /></div>
+            <div class="form-group"><label>ঈশ্বরদীর ভেতরে ডেলিভারি চার্জ (৳)</label><input type="number" id="setIshwardi" class="form-control" value="60" /></div>
+            <div class="form-group"><label>সারাদেশ বাংলাদেশ ডেলিভারি চার্জ (৳)</label><input type="number" id="setOutside" class="form-control" value="120" /></div>
+            <div class="form-group"><label>cPanel Upload URL (upload.php)</label><input type="text" id="setUploadUrl" class="form-control" placeholder="https://.../upload.php" /></div>
+            <div class="form-group"><label>Cloudflare Worker URL (Courier API Proxy)</label><input type="text" id="setWorkerUrl" class="form-control" placeholder="https://your-worker.workers.dev" /></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>পেমেন্ট গেটওয়ে (বিকাশ, নগদ, রকেট)</h3></div>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">নম্বর, ধরন (Personal/Merchant) ও কাস্টমার কী করবে সেই নির্দেশনা লিখুন—এটি চেকআউট ও পেমেন্ট গেটওয়ে পেজে দেখাবে।</p>
+
+          <!-- bKash -->
+          <div style="border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;">
+            <label style="display:flex;align-items:center;gap:8px;font-weight:700;color:#e2136e;margin-bottom:8px;">
+              <input type="checkbox" id="gwBkashOn" style="width:17px;height:17px;accent-color:#e2136e;" /> bKash (বিকাশ) চালু রাখুন
+            </label>
+            <div class="grid-2">
+              <div class="form-group"><label>বিকাশ নম্বর</label><input type="text" id="gwBkashNum" class="form-control" placeholder="01XXXXXXXXX" /></div>
+              <div class="form-group">
+                <label>অ্যাকাউন্ট ধরন</label>
+                <select id="gwBkashType" class="form-control"><option value="Personal">Personal</option><option value="Merchant">Merchant</option><option value="Agent">Agent</option></select>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:0;"><label>কাস্টমারের জন্য নির্দেশনা</label><input type="text" id="gwBkashNote" class="form-control" placeholder="যেমন: Send Money করে TrxID বা নম্বর দিন" /></div>
+          </div>
+
+          <!-- Nagad -->
+          <div style="border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;">
+            <label style="display:flex;align-items:center;gap:8px;font-weight:700;color:#f7941d;margin-bottom:8px;">
+              <input type="checkbox" id="gwNagadOn" style="width:17px;height:17px;accent-color:#f7941d;" /> Nagad (নগদ) চালু রাখুন
+            </label>
+            <div class="grid-2">
+              <div class="form-group"><label>নগদ নম্বর</label><input type="text" id="gwNagadNum" class="form-control" placeholder="01XXXXXXXXX" /></div>
+              <div class="form-group">
+                <label>অ্যাকাউন্ট ধরন</label>
+                <select id="gwNagadType" class="form-control"><option value="Personal">Personal</option><option value="Merchant">Merchant</option><option value="Agent">Agent</option></select>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:0;"><label>কাস্টমারের জন্য নির্দেশনা</label><input type="text" id="gwNagadNote" class="form-control" placeholder="যেমন: Send Money করুন" /></div>
+          </div>
+
+          <!-- Rocket -->
+          <div style="border:1px solid var(--border);border-radius:10px;padding:12px;">
+            <label style="display:flex;align-items:center;gap:8px;font-weight:700;color:#8c3494;margin-bottom:8px;">
+              <input type="checkbox" id="gwRocketOn" style="width:17px;height:17px;accent-color:#8c3494;" /> Rocket (রকেট) চালু রাখুন
+            </label>
+            <div class="grid-2">
+              <div class="form-group"><label>রকেট নম্বর</label><input type="text" id="gwRocketNum" class="form-control" placeholder="01XXXXXXXXX" /></div>
+              <div class="form-group">
+                <label>অ্যাকাউন্ট ধরন</label>
+                <select id="gwRocketType" class="form-control"><option value="Personal">Personal</option><option value="Merchant">Merchant</option><option value="Agent">Agent</option></select>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:0;"><label>কাস্টমারের জন্য নির্দেশনা</label><input type="text" id="gwRocketNote" class="form-control" placeholder="যেমন: Send Money করুন" /></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>কুরিয়ার API সেটআপ (Steadfast, Pathao, CarryBee)</h3></div>
+          <div class="form-group">
+            <label>ডিফল্ট কুরিয়ার</label>
+            <select id="courDefault" class="form-control">
+              <option value="steadfast">Steadfast Courier</option>
+              <option value="pathao">Pathao Courier</option>
+              <option value="carrybee">CarryBee Courier</option>
+            </select>
+          </div>
+
+          <!-- Steadfast -->
+          <div style="border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;">
+            <label style="display:flex;align-items:center;gap:8px;font-weight:700;color:var(--navy);margin-bottom:8px;">
+              <input type="checkbox" id="sfEnabled" style="width:17px;height:17px;accent-color:var(--navy);" /> Steadfast Courier চালু রাখুন
+            </label>
+            <div class="grid-2">
+              <div class="form-group" style="margin-bottom:0;"><label>Api-Key</label><input type="text" id="sfApiKey" class="form-control" /></div>
+              <div class="form-group" style="margin-bottom:0;"><label>Secret-Key</label><input type="password" id="sfSecretKey" class="form-control" /></div>
+            </div>
+          </div>
+
+          <!-- Pathao -->
+          <div style="border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;">
+            <label style="display:flex;align-items:center;gap:8px;font-weight:700;color:var(--navy);margin-bottom:8px;">
+              <input type="checkbox" id="ptEnabled" style="width:17px;height:17px;accent-color:var(--navy);" /> Pathao Courier চালু রাখুন
+            </label>
+            <div class="grid-2">
+              <div class="form-group"><label>Client ID</label><input type="text" id="ptClientId" class="form-control" /></div>
+              <div class="form-group"><label>Client Secret</label><input type="password" id="ptClientSecret" class="form-control" /></div>
+              <div class="form-group"><label>Pathao Username/Email</label><input type="text" id="ptUsername" class="form-control" /></div>
+              <div class="form-group"><label>Pathao Password</label><input type="password" id="ptPassword" class="form-control" /></div>
+              <div class="form-group" style="margin-bottom:0;"><label>Store ID</label><input type="text" id="ptStoreId" class="form-control" /></div>
+            </div>
+          </div>
+
+          <!-- CarryBee -->
+          <div style="border:1px solid var(--border);border-radius:10px;padding:12px;">
+            <label style="display:flex;align-items:center;gap:8px;font-weight:700;color:var(--navy);margin-bottom:8px;">
+              <input type="checkbox" id="cbEnabled" style="width:17px;height:17px;accent-color:var(--navy);" /> CarryBee Courier চালু রাখুন
+            </label>
+            <div class="grid-2">
+              <div class="form-group"><label>API Key / Token</label><input type="text" id="cbApiKey" class="form-control" /></div>
+              <div class="form-group"><label>Store ID</label><input type="text" id="cbStoreId" class="form-control" /></div>
+              <div class="form-group"><label>Client ID (Optional)</label><input type="text" id="cbClientId" class="form-control" /></div>
+              <div class="form-group"><label>Client Secret (Optional)</label><input type="password" id="cbClientSecret" class="form-control" /></div>
+            </div>
+          </div>
+
+          <button class="btn btn-accent" id="saveSettingsBtn" style="width:100%;padding:12px;margin-top:14px;font-size:14px;">সব সেটিংস সেভ করুন</button>
+        </div>
+      </section>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="bottom-nav" id="bottomNav">
+      <button class="bnav-btn active" data-tab="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+        <span>ড্যাশবোর্ড</span>
+      </button>
+      <button class="bnav-btn" data-tab="orders">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/></svg>
+        <span>অর্ডার</span>
+      </button>
+      <button class="bnav-btn" data-tab="products">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        <span>প্রোডাক্ট</span>
+      </button>
+      <button class="bnav-btn" data-tab="media">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><polygon points="10 9 15 12 10 15 10 9"/></svg>
+        <span>মিডিয়া</span>
+      </button>
+      <button class="bnav-btn" data-tab="settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.79 1 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>সেটিংস</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- SUBPAGE 1: ADD / EDIT PRODUCT PAGE -->
+  <div class="subpage-view" id="productFormView">
+    <div class="subpage-header">
+      <button class="btn btn-sm" id="closeProductPageBtn" style="background:rgba(255,255,255,0.14);color:#fff;">← Back</button>
+      <strong id="prodFormTitle" style="font-size:15px;">নতুন প্রোডাক্ট যোগ করুন</strong>
+      <span style="width:52px;"></span>
+    </div>
+    <div class="subpage-body">
+      <div class="card">
+        <input type="hidden" id="editProdId" />
+        <div class="grid-2">
+          <div class="form-group"><label>ক্যাটাগরি *</label><select id="pCat" class="form-control"></select></div>
+          <div class="form-group"><label>প্রোডাক্টের নাম *</label><input type="text" id="pName" class="form-control" /></div>
+          <div class="form-group"><label>রেগুলার প্রাইস (৳) *</label><input type="number" id="pRegPrice" class="form-control" /></div>
+          <div class="form-group"><label>অফার প্রাইস (৳)</label><input type="number" id="pOffPrice" class="form-control" /></div>
+          <div class="form-group"><label>মোট স্টক</label><input type="number" id="pStock" class="form-control" value="10" /></div>
+          <div class="form-group" style="display:flex;align-items:center;gap:8px;padding-top:20px;">
+            <input type="checkbox" id="pBestSeller" style="width:18px;height:18px;accent-color:var(--navy);" />
+            <label for="pBestSeller" style="margin:0;cursor:pointer;">Best Seller ট্যাগ</label>
+          </div>
+        </div>
+
+        <div class="form-group"><label>বিস্তারিত বিবরণ</label><textarea id="pDesc" class="form-control" rows="3"></textarea></div>
+
+        <div class="form-group">
+          <label>মেইন ইমেজ (Link বা Upload)</label>
+          <div class="upload-row">
+            <img id="pMainPrev" class="img-preview-mini" src="https://placehold.co/80x80/f1f5f9/94a3b8?text=IMG" alt="" />
+            <input type="text" id="pMainImg" class="form-control" placeholder="Image URL" />
+            <input type="file" id="pMainFile" accept="image/*" style="display:none;" />
+            <button type="button" class="btn btn-primary btn-sm" id="btnUpMain" onclick="document.getElementById('pMainFile').click()">Upload</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>একাধিক গ্যালারি ইমেজ</label>
+          <div class="upload-row">
+            <input type="text" id="pGalUrl" class="form-control" placeholder="Gallery Image URL" />
+            <button type="button" class="btn btn-ghost btn-sm" id="addGalUrlBtn">+ Link</button>
+            <input type="file" id="pGalFile" accept="image/*" multiple style="display:none;" />
+            <button type="button" class="btn btn-accent btn-sm" id="btnUpGal" onclick="document.getElementById('pGalFile').click()">Upload</button>
+          </div>
+          <div class="gallery-chips" id="galleryPreview"></div>
+        </div>
+
+        <div class="form-group">
+          <label>প্রোডাক্ট ভিডিও (এক বা একাধিক লিংক অথবা Upload)</label>
+          <div class="upload-row">
+            <input type="text" id="pVidUrl" class="form-control" placeholder="YouTube / MP4 Link" />
+            <button type="button" class="btn btn-ghost btn-sm" id="addProdVidBtn">+ Link</button>
+            <input type="file" id="pVidFile" accept="video/*" style="display:none;" />
+            <button type="button" class="btn btn-primary btn-sm" id="btnUpProdVid" onclick="document.getElementById('pVidFile').click()">Upload</button>
+          </div>
+          <div id="prodVideoList" style="margin-top:8px;display:flex;flex-direction:column;gap:6px;"></div>
+        </div>
+
+        <div class="form-group">
+          <label>কালার / সাইজ ভেরিয়েন্ট</label>
+          <div id="variantsContainer"></div>
+          <button type="button" class="btn btn-ghost btn-sm" id="addVariantBtn">+ Variant যোগ করুন</button>
+        </div>
+      </div>
+
+      <!-- Per-Product Payment Rules -->
+      <div class="card">
+        <div class="card-head"><h3>অর্ডার ও পেমেন্ট রুলস (এই প্রোডাক্টের জন্য)</h3></div>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">যে পেমেন্ট অপশনগুলো অন রাখবেন, চেকআউটে কাস্টমার শুধু সেগুলোই দেখতে ও সিলেক্ট করতে পারবে।</p>
+
+        <label class="switch-row">
+          <span><strong>Cash on Delivery (COD)</strong> অনুমোদিত</span>
+          <input type="checkbox" id="ruleAllowCOD" checked />
+        </label>
+
+        <label class="switch-row">
+          <span><strong>শুধু ডেলিভারি চার্জ অ্যাডভান্স</strong> পেমেন্ট অপশন</span>
+          <input type="checkbox" id="ruleAdvDelivery" />
+        </label>
+
+        <div class="switch-row" style="flex-direction:column;align-items:stretch;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span><strong>নির্দিষ্ট টাকা অ্যাডভান্স</strong> পেমেন্ট অপশন</span>
+            <input type="checkbox" id="ruleFixedAdv" />
+          </div>
+          <input type="number" id="ruleFixedAmount" class="form-control" placeholder="কত টাকা অ্যাডভান্স করতে হবে? (যেমন: 200)" style="margin-top:8px;" />
+        </div>
+
+        <label class="switch-row">
+          <span><strong>সম্পূর্ণ টাকা (Full Payment)</strong> অপশন</span>
+          <input type="checkbox" id="ruleFullPay" />
+        </label>
+
+        <div class="form-group" style="margin-top:8px;">
+          <label>কাস্টম পেমেন্ট নোট (ঐচ্ছিক)</label>
+          <input type="text" id="ruleNote" class="form-control" placeholder="যেমন: অর্ডার কনফার্ম করতে ডেলিভারি চার্জ অগ্রিম পরিশোধ করুন" />
+        </div>
+
+        <button class="btn btn-accent" id="saveProdBtn" style="width:100%;padding:12px;font-size:14px;">প্রোডাক্ট সেভ করুন</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUBPAGE 2: ORDER DETAILS PAGE -->
+  <div class="subpage-view" id="orderDetailView">
+    <div class="subpage-header">
+      <button class="btn btn-sm" id="closeOrderDetailBtn" style="background:rgba(255,255,255,0.14);color:#fff;">← Back</button>
+      <strong id="odHeaderTitle" style="font-size:15px;">Order Details</strong>
+      <button class="btn btn-sm btn-accent" id="odPrintBtn">Print</button>
+    </div>
+    <div class="subpage-body" id="orderDetailBody"></div>
+  </div>
+
+  <div class="toast" id="toastBox"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+    import { getFirestore, collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC7qQLrHIDOOxxSUcDsjR5EcHO4-0mByNQ",
+      authDomain: "th-sports-afd52.firebaseapp.com",
+      projectId: "th-sports-afd52",
+      storageBucket: "th-sports-afd52.firebasestorage.app",
+      messagingSenderId: "479595748038",
+      appId: "1:479595748038:web:0a0f2389d2b9f13aa215c7",
+      measurementId: "G-H8L744Y578"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const prog = document.getElementById("topProgress");
+
+    let categories = [], products = [], orders = [], galleryUrls = [], prodVideoUrls = [];
+    let selectedOrderIds = new Set();
+    let orderStatusFilter = "All", orderSearch = "";
+    let activeOrderId = null;
+
+    let storeConfig = {
+      logoUrl: "", uploadUrl: "", whatsapp: "", workerUrl: "",
+      ishwardiCharge: 60, outsideIshwardiCharge: 120,
+      gateways: {
+        bkash: { enabled: true, number: "", type: "Personal", instruction: "Send Money করুন" },
+        nagad: { enabled: false, number: "", type: "Personal", instruction: "Send Money করুন" },
+        rocket: { enabled: false, number: "", type: "Personal", instruction: "Send Money করুন" }
+      },
+      couriers: {
+        defaultCourier: "steadfast",
+        steadfast: { enabled: false, apiKey: "", secretKey: "" },
+        pathao: { enabled: false, clientId: "", clientSecret: "", username: "", password: "", storeId: "" },
+        carrybee: { enabled: false, apiKey: "", clientId: "", clientSecret: "", storeId: "" }
+      }
+    };
+
+    const esc = (s) => String(s || "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    function showToast(msg) {
+      const t = document.getElementById("toastBox"); t.textContent = msg; t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 2500);
+    }
+
+    // Mobile Back Button Handler
+    function pushSubpageState(view) {
+      if (history.state?.subview !== view) history.pushState({ subview: view }, "");
+    }
+    window.addEventListener("popstate", () => {
+      if (document.getElementById("productFormView").classList.contains("open")) {
+        document.getElementById("productFormView").classList.remove("open");
+      }
+      if (document.getElementById("orderDetailView").classList.contains("open")) {
+        document.getElementById("orderDetailView").classList.remove("open");
+      }
+    });
+
+    // Auth
+    onAuthStateChanged(auth, (user) => {
+      document.getElementById("loginWrap").style.display = user ? "none" : "flex";
+      document.getElementById("adminLayout").style.display = user ? "block" : "none";
+      if (user) loadAllAdminData();
+    });
+
+    document.getElementById("loginForm").onsubmit = async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("loginBtn");
+      btn.disabled = true; btn.textContent = "Signing in...";
+      document.getElementById("loginErr").textContent = "";
+      try {
+        await signInWithEmailAndPassword(auth, document.getElementById("loginEmail").value.trim(), document.getElementById("loginPass").value);
+      } catch (err) {
+        document.getElementById("loginErr").textContent = "ইমেইল বা পাসওয়ার্ড সঠিক নয়।";
+      } finally {
+        btn.disabled = false; btn.textContent = "Sign In";
+      }
+    };
+    document.getElementById("logoutBtn").onclick = () => signOut(auth);
+
+    // Tab Navigation (Desktop + Bottom Mobile Nav)
+    function switchTab(tabName) {
+      document.querySelectorAll(".tab-btn, .bnav-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tabName));
+      document.querySelectorAll(".tab-panel").forEach(p => p.classList.toggle("active", p.id === "tab-" + tabName));
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }
+    document.getElementById("desktopTabs").onclick = (e) => { const b = e.target.closest(".tab-btn"); if (b) switchTab(b.dataset.tab); };
+    document.getElementById("bottomNav").onclick = (e) => { const b = e.target.closest(".bnav-btn"); if (b) switchTab(b.dataset.tab); };
+
+    document.getElementById("mediaSubTabs").onclick = (e) => {
+      const pill = e.target.closest(".f-pill"); if (!pill) return;
+      document.querySelectorAll("#mediaSubTabs .f-pill").forEach(p => p.classList.toggle("active", p === pill));
+      document.querySelectorAll(".subtab-panel").forEach(sp => sp.classList.toggle("active", sp.id === "sub-" + pill.dataset.sub));
+    };
+
+    // Upload Utility
+    async function uploadFile(file, btnEl) {
+      if (!storeConfig.uploadUrl) {
+        showToast("Settings-এ upload.php লিংক নেই—সরাসরি লিংক দিন");
+        return null;
+      }
+      const old = btnEl ? btnEl.textContent : "";
+      if (btnEl) { btnEl.disabled = true; btnEl.textContent = "..."; }
+      try {
+        const fd = new FormData(); fd.append("image", file);
+        const res = await fetch(storeConfig.uploadUrl, { method: "POST", body: fd });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || "Upload failed");
+        return data.url;
+      } finally {
+        if (btnEl) { btnEl.disabled = false; btnEl.textContent = old; }
+      }
+    }
+
+    function bindUpload(fileId, inputId, prevId, btnId) {
+      document.getElementById(fileId).onchange = async (e) => {
+        const f = e.target.files[0]; if (!f) return;
+        try {
+          const url = await uploadFile(f, document.getElementById(btnId));
+          if (url) {
+            document.getElementById(inputId).value = url;
+            if (prevId) document.getElementById(prevId).src = url;
+            showToast("Uploaded ✓");
+          }
+        } catch (err) { showToast("Upload error"); }
+      };
+    }
+    bindUpload("pMainFile", "pMainImg", "pMainPrev", "btnUpMain");
+    bindUpload("catFile", "catImg", "catPrev", "btnUpCat");
+    bindUpload("banFile", "banImg", "banPrev", "btnUpBan");
+    bindUpload("logoFile", "setLogoUrl", "logoPrev", "btnUpLogo");
+    bindUpload("vidThumbFile", "vidThumb", null, "btnUpVidThumb");
+    bindUpload("vidFile", "vidUrl", null, "btnUpVid");
+
+    // Live Preview on Link Input
+    [["pMainImg","pMainPrev"],["catImg","catPrev"],["banImg","banPrev"],["setLogoUrl","logoPrev"]].forEach(([i, p]) => {
+      document.getElementById(i).addEventListener("input", e => { if (e.target.value.trim()) document.getElementById(p).src = e.target.value.trim(); });
+    });
+
+    // Gallery & Product Videos in Form
+    document.getElementById("pGalFile").onchange = async (e) => {
+      const btn = document.getElementById("btnUpGal");
+      for (const f of e.target.files) {
+        const url = await uploadFile(f, btn);
+        if (url) { galleryUrls.push(url); renderGalleryPreview(); }
+      }
+    };
+    document.getElementById("addGalUrlBtn").onclick = () => {
+      const u = document.getElementById("pGalUrl").value.trim(); if (!u) return;
+      galleryUrls.push(u); document.getElementById("pGalUrl").value = ""; renderGalleryPreview();
+    };
+    function renderGalleryPreview() {
+      document.getElementById("galleryPreview").innerHTML = galleryUrls.map((u, i) => `
+        <div class="g-chip"><img src="${esc(u)}" /><button type="button" onclick="removeGal(${i})">×</button></div>
+      `).join("");
+    }
+    window.removeGal = (i) => { galleryUrls.splice(i, 1); renderGalleryPreview(); };
+
+    document.getElementById("pVidFile").onchange = async (e) => {
+      const f = e.target.files[0]; if (!f) return;
+      const url = await uploadFile(f, document.getElementById("btnUpProdVid"));
+      if (url) { prodVideoUrls.push(url); renderProdVideos(); showToast("Video Uploaded ✓"); }
+    };
+    document.getElementById("addProdVidBtn").onclick = () => {
+      const u = document.getElementById("pVidUrl").value.trim(); if (!u) return;
+      prodVideoUrls.push(u); document.getElementById("pVidUrl").value = ""; renderProdVideos();
+    };
+    function renderProdVideos() {
+      document.getElementById("prodVideoList").innerHTML = prodVideoUrls.map((u, i) => `
+        <div style="display:flex;justify-content:space-between;align-items:center;background:#f8fafc;padding:6px 10px;border-radius:8px;border:1px solid var(--border);font-size:12px;">
+          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:85%;">${esc(u)}</span>
+          <button type="button" class="btn btn-danger btn-sm" onclick="removeProdVid(${i})">×</button>
+        </div>
+      `).join("");
+    }
+    window.removeProdVid = (i) => { prodVideoUrls.splice(i, 1); renderProdVideos(); };
+
+    function addVariantRow(v = { name: "", color: "#000000", price: "", stock: "" }) {
+      const div = document.createElement("div"); div.className = "variant-row";
+      div.innerHTML = `
+        <input type="text" class="form-control v-name" placeholder="কালার/সাইজ" value="${esc(v.name)}" />
+        <input type="color" class="form-control v-color" value="${esc(v.color || '#000000')}" style="padding:2px;height:36px;" />
+        <input type="number" class="form-control v-price" placeholder="দাম" value="${esc(v.price)}" />
+        <input type="number" class="form-control v-stock" placeholder="স্টক" value="${esc(v.stock)}" />
+        <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">×</button>
+      `;
+      document.getElementById("variantsContainer").appendChild(div);
+    }
+    document.getElementById("addVariantBtn").onclick = () => addVariantRow();
+
+    // Load All Data
+    async function loadAllAdminData() {
+      prog.style.width = "50%"; prog.style.opacity = "1";
+      const s = await getDoc(doc(db, "settings", "store"));
+      if (s.exists()) {
+        const d = s.data();
+        storeConfig = {
+          ...storeConfig, ...d,
+          gateways: { ...storeConfig.gateways, ...(d.gateways || {}) },
+          couriers: {
+            ...storeConfig.couriers, ...(d.couriers || {}),
+            steadfast: { ...storeConfig.couriers.steadfast, ...(d.couriers?.steadfast || {}) },
+            pathao: { ...storeConfig.couriers.pathao, ...(d.couriers?.pathao || {}) },
+            carrybee: { ...storeConfig.couriers.carrybee, ...(d.couriers?.carrybee || {}) }
+          }
+        };
+        populateSettingsUI();
+      }
+      await Promise.all([loadCategories(), loadProducts(), loadOrders(), loadBanners(), loadVideos(), loadReviews()]);
+      prog.style.width = "100%"; setTimeout(() => prog.style.opacity = "0", 300);
+    }
+
+    function populateSettingsUI() {
+      document.getElementById("setLogoUrl").value = storeConfig.logoUrl || "";
+      if (storeConfig.logoUrl) {
+        document.getElementById("logoPrev").src = storeConfig.logoUrl;
+        document.querySelectorAll(".brand-logo-img").forEach(img => img.src = storeConfig.logoUrl);
+      }
+      document.getElementById("setWhatsapp").value = storeConfig.whatsapp || "";
+      document.getElementById("setIshwardi").value = storeConfig.ishwardiCharge ?? storeConfig.insideDhaka ?? 60;
+      document.getElementById("setOutside").value = storeConfig.outsideIshwardiCharge ?? storeConfig.outsideDhaka ?? 120;
+      document.getElementById("setUploadUrl").value = storeConfig.uploadUrl || "";
+      document.getElementById("setWorkerUrl").value = storeConfig.workerUrl || "";
+
+      const g = storeConfig.gateways;
+      document.getElementById("gwBkashOn").checked = !!g.bkash?.enabled;
+      document.getElementById("gwBkashNum").value = g.bkash?.number || "";
+      document.getElementById("gwBkashType").value = g.bkash?.type || "Personal";
+      document.getElementById("gwBkashNote").value = g.bkash?.instruction || "";
+
+      document.getElementById("gwNagadOn").checked = !!g.nagad?.enabled;
+      document.getElementById("gwNagadNum").value = g.nagad?.number || "";
+      document.getElementById("gwNagadType").value = g.nagad?.type || "Personal";
+      document.getElementById("gwNagadNote").value = g.nagad?.instruction || "";
+
+      document.getElementById("gwRocketOn").checked = !!g.rocket?.enabled;
+      document.getElementById("gwRocketNum").value = g.rocket?.number || "";
+      document.getElementById("gwRocketType").value = g.rocket?.type || "Personal";
+      document.getElementById("gwRocketNote").value = g.rocket?.instruction || "";
+
+      const c = storeConfig.couriers;
+      document.getElementById("courDefault").value = c.defaultCourier || "steadfast";
+      document.getElementById("sfEnabled").checked = !!c.steadfast?.enabled;
+      document.getElementById("sfApiKey").value = c.steadfast?.apiKey || "";
+      document.getElementById("sfSecretKey").value = c.steadfast?.secretKey || "";
+
+      document.getElementById("ptEnabled").checked = !!c.pathao?.enabled;
+      document.getElementById("ptClientId").value = c.pathao?.clientId || "";
+      document.getElementById("ptClientSecret").value = c.pathao?.clientSecret || "";
+      document.getElementById("ptUsername").value = c.pathao?.username || "";
+      document.getElementById("ptPassword").value = c.pathao?.password || "";
+      document.getElementById("ptStoreId").value = c.pathao?.storeId || "";
+
+      document.getElementById("cbEnabled").checked = !!c.carrybee?.enabled;
+      document.getElementById("cbApiKey").value = c.carrybee?.apiKey || "";
+      document.getElementById("cbStoreId").value = c.carrybee?.storeId || "";
+      document.getElementById("cbClientId").value = c.carrybee?.clientId || "";
+      document.getElementById("cbClientSecret").value = c.carrybee?.clientSecret || "";
+    }
+
+    document.getElementById("saveSettingsBtn").onclick = async () => {
+      storeConfig = {
+        logoUrl: document.getElementById("setLogoUrl").value.trim(),
+        whatsapp: document.getElementById("setWhatsapp").value.trim(),
+        ishwardiCharge: Number(document.getElementById("setIshwardi").value || 60),
+        outsideIshwardiCharge: Number(document.getElementById("setOutside").value || 120),
+        insideDhaka: Number(document.getElementById("setIshwardi").value || 60),
+        outsideDhaka: Number(document.getElementById("setOutside").value || 120),
+        uploadUrl: document.getElementById("setUploadUrl").value.trim(),
+        workerUrl: document.getElementById("setWorkerUrl").value.trim().replace(/\/+$/, ""),
+        gateways: {
+          bkash: { enabled: document.getElementById("gwBkashOn").checked, number: document.getElementById("gwBkashNum").value.trim(), type: document.getElementById("gwBkashType").value, instruction: document.getElementById("gwBkashNote").value.trim() },
+          nagad: { enabled: document.getElementById("gwNagadOn").checked, number: document.getElementById("gwNagadNum").value.trim(), type: document.getElementById("gwNagadType").value, instruction: document.getElementById("gwNagadNote").value.trim() },
+          rocket: { enabled: document.getElementById("gwRocketOn").checked, number: document.getElementById("gwRocketNum").value.trim(), type: document.getElementById("gwRocketType").value, instruction: document.getElementById("gwRocketNote").value.trim() }
+        },
+        couriers: {
+          defaultCourier: document.getElementById("courDefault").value,
+          steadfast: { enabled: document.getElementById("sfEnabled").checked, apiKey: document.getElementById("sfApiKey").value.trim(), secretKey: document.getElementById("sfSecretKey").value.trim() },
+          pathao: { enabled: document.getElementById("ptEnabled").checked, clientId: document.getElementById("ptClientId").value.trim(), clientSecret: document.getElementById("ptClientSecret").value.trim(), username: document.getElementById("ptUsername").value.trim(), password: document.getElementById("ptPassword").value.trim(), storeId: document.getElementById("ptStoreId").value.trim() },
+          carrybee: { enabled: document.getElementById("cbEnabled").checked, apiKey: document.getElementById("cbApiKey").value.trim(), storeId: document.getElementById("cbStoreId").value.trim(), clientId: document.getElementById("cbClientId").value.trim(), clientSecret: document.getElementById("cbClientSecret").value.trim() }
+        }
+      };
+      await setDoc(doc(db, "settings", "store"), storeConfig);
+      showToast("সব সেটিংস সেভ হয়েছে ✓");
+    };
+
+    // ================= ORDERS LOGIC =================
+    function getOrderCode(o, fallbackIdx) {
+      if (o.orderCode) return o.orderCode;
+      if (o.orderSeq) return "TH" + String(o.orderSeq).padStart(2, "0");
+      return "#" + o.id.slice(0, 6).toUpperCase();
+    }
+
+    function statusClass(st) {
+      if (st === "Ready for Delivery" || st === "Courier") return "st-Ready";
+      return "st-" + (st || "Pending");
+    }
+
+    async function loadOrders() {
+      const snap = await getDocs(collection(db, "orders"));
+      orders = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+
+      const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+      let todayCount = 0, pendingCount = 0, readyCount = 0, totalRev = 0;
+      const salesMap = {};
+
+      orders.forEach(o => {
+        if ((o.createdAt || 0) >= todayStart.getTime()) todayCount++;
+        if (o.status === "Pending") pendingCount++;
+        if (o.status === "Ready for Delivery" || o.consignmentId) readyCount++;
+        if (o.status !== "Cancelled" && o.status !== "Returned") {
+          totalRev += Number(o.totalAmount || 0);
+          (o.items || []).forEach(it => {
+            if (!salesMap[it.name]) salesMap[it.name] = { qty: 0, total: 0 };
+            salesMap[it.name].qty += Number(it.qty || 1);
+            salesMap[it.name].total += Number(it.price || 0) * Number(it.qty || 1);
+          });
+        }
+      });
+
+      document.getElementById("statsGrid").innerHTML = `
+        <div class="stat-card"><small>মোট অর্ডার</small><h2>${orders.length}</h2></div>
+        <div class="stat-card"><small>আজকের অর্ডার</small><h2 style="color:var(--orange)">${todayCount}</h2></div>
+        <div class="stat-card"><small>Pending / Ready</small><h2>${pendingCount} / ${readyCount}</h2></div>
+        <div class="stat-card"><small>মোট সেলস</small><h2>${totalRev.toLocaleString()}৳</h2></div>
+      `;
+
+      const salesArr = Object.entries(salesMap).sort((a,b) => b[1].qty - a[1].qty);
+      document.getElementById("salesReportWrap").innerHTML = salesArr.length
+        ? `<table style="width:100%;border-collapse:collapse;font-size:13px;">
+            <tr style="border-bottom:1px solid var(--border);color:var(--muted);"><th style="text-align:left;padding:8px;">প্রোডাক্ট</th><th style="text-align:left;padding:8px;">পিস</th><th style="text-align:right;padding:8px;">আয়</th></tr>
+            ${salesArr.map(([n, d]) => `<tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:8px;font-weight:600;">${esc(n)}</td><td style="padding:8px;">${d.qty}</td><td style="padding:8px;text-align:right;font-weight:700;">${d.total.toLocaleString()}৳</td></tr>`).join("")}
+          </table>`
+        : `<p style="color:var(--muted);font-size:13px;">এখনও কোনো সেলস নেই</p>`;
+
+      renderOrdersGrid();
+    }
+
+    function getFilteredOrders() {
+      const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+      return orders.filter(o => {
+        const code = getOrderCode(o).toLowerCase();
+        const matchSearch = !orderSearch ||
+          code.includes(orderSearch) ||
+          (o.customerName || "").toLowerCase().includes(orderSearch) ||
+          (o.phone || "").toLowerCase().includes(orderSearch) ||
+          String(o.consignmentId || "").toLowerCase().includes(orderSearch) ||
+          String(o.trackingCode || "").toLowerCase().includes(orderSearch);
+
+        if (!matchSearch) return false;
+
+        if (orderStatusFilter === "All") return true;
+        if (orderStatusFilter === "Today") return (o.createdAt || 0) >= todayStart.getTime();
+        if (orderStatusFilter === "Ready for Delivery") {
+          return (o.status === "Ready for Delivery" || o.status === "Courier") && !!o.consignmentId;
+        }
+        return o.status === orderStatusFilter;
+      });
+    }
+
+    function renderOrdersGrid() {
+      const list = getFilteredOrders();
+      document.getElementById("filteredOrdersCount").textContent = `${list.length} টি অর্ডার`;
+      const grid = document.getElementById("ordersGrid");
+
+      if (!list.length) {
+        grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:36px;color:var(--muted);font-size:13px;">কোনো অর্ডার পাওয়া যায়নি।</div>`;
+        updateBulkUI();
+        return;
+      }
+
+      grid.innerHTML = list.map(o => {
+        const code = getOrderCode(o);
+        const isChecked = selectedOrderIds.has(o.id);
+        return `
+          <div class="order-card ${isChecked ? 'selected' : ''}" data-id="${o.id}">
+            <div class="oc-top">
+              <div class="oc-check-wrap" onclick="event.stopPropagation()">
+                <input type="checkbox" class="oc-check" data-id="${o.id}" ${isChecked ? 'checked' : ''} />
+                <span class="oc-id">${esc(code)}</span>
+              </div>
+              <span class="status-badge ${statusClass(o.status)}">${esc(o.status || 'Pending')}</span>
+            </div>
+            <div class="oc-name">${esc(o.customerName)}</div>
+            <div class="oc-phone">${esc(o.phone)}</div>
+            ${o.consignmentId ? `<div class="oc-courier-tag">${esc(o.courierProvider || 'Courier')}: ${esc(o.courierStatus || o.consignmentId)}</div>` : ''}
+            <div class="oc-bottom">
+              <span class="oc-price">${o.totalAmount}৳</span>
+              <span style="font-size:10.5px;color:var(--muted);font-weight:600;">${esc(o.paymentMethod || 'COD')}</span>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      grid.querySelectorAll(".oc-check").forEach(cb => {
+        cb.onchange = () => {
+          if (cb.checked) selectedOrderIds.add(cb.dataset.id);
+          else selectedOrderIds.delete(cb.dataset.id);
+          cb.closest(".order-card").classList.toggle("selected", cb.checked);
+          updateBulkUI();
+        };
+      });
+
+      grid.querySelectorAll(".order-card").forEach(card => {
+        card.onclick = () => openOrderDetail(card.dataset.id);
+      });
+      updateBulkUI();
+    }
+
+    function updateBulkUI() {
+      const visibleIds = getFilteredOrders().map(o => o.id);
+      const count = selectedOrderIds.size;
+      document.getElementById("selectedCountLabel").textContent = count;
+      document.getElementById("bulkActionsBar").classList.toggle("show", count > 0);
+      document.getElementById("selectAllOrders").checked = visibleIds.length > 0 && visibleIds.every(id => selectedOrderIds.has(id));
+    }
+
+    document.getElementById("selectAllOrders").onchange = (e) => {
+      const visible = getFilteredOrders();
+      if (e.target.checked) visible.forEach(o => selectedOrderIds.add(o.id));
+      else visible.forEach(o => selectedOrderIds.delete(o.id));
+      renderOrdersGrid();
+    };
+
+    document.getElementById("orderSearchInput").oninput = (e) => { orderSearch = e.target.value.trim().toLowerCase(); renderOrdersGrid(); };
+    document.getElementById("orderFilterPills").onclick = (e) => {
+      const pill = e.target.closest(".f-pill"); if (!pill) return;
+      orderStatusFilter = pill.dataset.st;
+      selectedOrderIds.clear();
+      document.querySelectorAll("#orderFilterPills .f-pill").forEach(p => p.classList.toggle("active", p === pill));
+      renderOrdersGrid();
+    };
+
+    document.getElementById("applyBulkStatusBtn").onclick = async () => {
+      const newSt = document.getElementById("bulkStatusSelect").value;
+      if (!newSt || !selectedOrderIds.size) return showToast("স্ট্যাটাস এবং অর্ডার সিলেক্ট করুন");
+      for (const id of selectedOrderIds) {
+        await updateDoc(doc(db, "orders", id), { status: newSt, updatedAt: Date.now() });
+      }
+      selectedOrderIds.clear();
+      showToast("সবগুলো স্ট্যাটাস আপডেট হয়েছে ✓");
+      loadOrders();
+    };
+
+    // Courier Dispatch Engine (Calls Existing Cloudflare Worker)
+    async function dispatchOrderToCourier(o, provider) {
+      const wUrl = storeConfig.workerUrl;
+      if (!wUrl) throw new Error("Settings-এ Cloudflare Worker URL সেট করা নেই");
+      const code = getOrderCode(o);
+      const dueCod = o.dueAmount !== undefined ? Number(o.dueAmount) : Math.max(0, Number(o.totalAmount || 0) - Number(o.paidAmount || 0));
+
+      if (provider === "steadfast") {
+        const sf = storeConfig.couriers?.steadfast;
+        if (!sf?.apiKey || !sf?.secretKey) throw new Error("Steadfast API Key সেট করা নেই");
+        const res = await fetch(wUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            api_key: sf.apiKey,
+            secret_key: sf.secretKey,
+            invoice: code,
+            recipient_name: o.customerName,
+            recipient_phone: o.phone,
+            recipient_address: o.address,
+            cod_amount: dueCod,
+            note: `Order ${code}`
+          })
+        });
+        const data = await res.json();
+        if (data.status === 200 && data.consignment) {
+          await updateDoc(doc(db, "orders", o.id), {
+            status: "Ready for Delivery",
+            courierProvider: "steadfast",
+            consignmentId: String(data.consignment.consignment_id),
+            trackingCode: String(data.consignment.tracking_code || ""),
+            invoiceId: code,
+            courierStatus: data.consignment.status || "in_review",
+            updatedAt: Date.now()
+          });
+          return true;
+        }
+        throw new Error(data.message || "Steadfast Error");
+      }
+
+      if (provider === "pathao") {
+        const pt = storeConfig.couriers?.pathao;
+        if (!pt?.clientId || !pt?.clientSecret || !pt?.storeId) throw new Error("Pathao credentials সেট করা নেই");
+        const res = await fetch(wUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            provider: "pathao",
+            client_id: pt.clientId,
+            client_secret: pt.clientSecret,
+            username: pt.username,
+            password: pt.password,
+            store_id: pt.storeId,
+            recipient_name: o.customerName,
+            recipient_phone: o.phone,
+            recipient_address: o.address,
+            item_quantity: (o.items || []).reduce((s, i) => s + (i.qty || 1), 0),
+            amount_to_collect: dueCod,
+            item_description: (o.items || []).map(i => i.name).join(", "),
+            special_instruction: `Order ${code}`
+          })
+        });
+        const data = await res.json();
+        const cid = data?.data?.consignment_id || data?.consignment_id;
+        if (cid) {
+          await updateDoc(doc(db, "orders", o.id), {
+            status: "Ready for Delivery",
+            courierProvider: "pathao",
+            consignmentId: String(cid),
+            trackingCode: String(cid),
+            invoiceId: code,
+            courierStatus: "Pending Pickup",
+            updatedAt: Date.now()
+          });
+          return true;
+        }
+        throw new Error(data.message || "Pathao Error");
+      }
+
+      if (provider === "carrybee") {
+        const cb = storeConfig.couriers?.carrybee;
+        if (!cb?.apiKey && !cb?.clientId) throw new Error("CarryBee credentials সেট করা নেই");
+        const res = await fetch(wUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            provider: "carrybee",
+            action: "carrybee_create",
+            apiKey: cb.apiKey,
+            clientId: cb.clientId,
+            clientSecret: cb.clientSecret,
+            storeId: cb.storeId,
+            order: { id: code, customerName: o.customerName, phone: o.phone, address: o.address, dueAmount: dueCod }
+          })
+        });
+        const data = await res.json();
+        const cid = data?.data?.tracking_id || data?.tracking_id || data?.consignment_id;
+        if (cid) {
+          await updateDoc(doc(db, "orders", o.id), {
+            status: "Ready for Delivery",
+            courierProvider: "carrybee",
+            consignmentId: String(cid),
+            trackingCode: String(cid),
+            invoiceId: code,
+            courierStatus: "Created",
+            updatedAt: Date.now()
+          });
+          return true;
+        }
+        throw new Error(data.message || "CarryBee Error");
+      }
+    }
+
+    async function syncLiveCourierStatus(o) {
+      if (!storeConfig.workerUrl || !o.consignmentId) return;
+      let payload = null;
+      if (o.courierProvider === "steadfast") {
+        const sf = storeConfig.couriers?.steadfast;
+        payload = { action: "steadfast_status", api_key: sf.apiKey, secret_key: sf.secretKey, consignment_id: o.consignmentId };
+      } else if (o.courierProvider === "pathao") {
+        const pt = storeConfig.couriers?.pathao;
+        payload = { provider: "pathao", action: "pathao_status", client_id: pt.clientId, client_secret: pt.clientSecret, username: pt.username, password: pt.password, consignment_id: o.consignmentId };
+      } else if (o.courierProvider === "carrybee") {
+        const cb = storeConfig.couriers?.carrybee;
+        payload = { provider: "carrybee", action: "carrybee_status", apiKey: cb.apiKey, clientId: cb.clientId, clientSecret: cb.clientSecret, consignment_id: o.consignmentId };
+      }
+      if (!payload) return;
+      const res = await fetch(storeConfig.workerUrl, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+      const data = await res.json();
+      if (data.delivery_status) {
+        const ds = data.delivery_status.toLowerCase();
+        let nextStatus = o.status;
+        if (ds.includes("deliver") && !ds.includes("partial")) nextStatus = "Delivered";
+        else if (ds.includes("cancel") || ds.includes("return")) nextStatus = "Returned";
+        await updateDoc(doc(db, "orders", o.id), {
+          courierStatus: data.delivery_status,
+          status: nextStatus,
+          courierUpdatedAt: Date.now()
+        });
+      }
+    }
+
+    async function handleBulkSendCourier(provider) {
+      if (!selectedOrderIds.size) return;
+      let ok = 0, fail = 0;
+      showToast(`${provider.toUpperCase()}-এ পাঠানো হচ্ছে...`);
+      for (const id of selectedOrderIds) {
+        const o = orders.find(x => x.id === id);
+        if (!o) continue;
+        try { await dispatchOrderToCourier(o, provider); ok++; }
+        catch (err) { fail++; }
+      }
+      selectedOrderIds.clear();
+      await loadOrders();
+      showToast(`সফল: ${ok}টি, ব্যর্থ: ${fail}টি`);
+    }
+    document.getElementById("bulkSteadfastBtn").onclick = () => handleBulkSendCourier("steadfast");
+    document.getElementById("bulkPathaoBtn").onclick = () => handleBulkSendCourier("pathao");
+
+    document.getElementById("syncAllCourierBtn").onclick = async () => {
+      const btn = document.getElementById("syncAllCourierBtn");
+      btn.disabled = true; btn.textContent = "Syncing...";
+      const dispatched = orders.filter(o => o.consignmentId && o.status !== "Delivered" && o.status !== "Cancelled");
+      for (const o of dispatched) {
+        try { await syncLiveCourierStatus(o); } catch (e) {}
+      }
+      await loadOrders();
+      btn.disabled = false; btn.textContent = "Sync Live";
+      showToast(`${dispatched.length}টি অর্ডারের লাইভ স্ট্যাটাস আপডেট হয়েছে ✓`);
+    };
+
+    // Order Details Sub-Page
+    function openOrderDetail(id) {
+      const o = orders.find(x => x.id === id);
+      if (!o) return;
+      activeOrderId = id;
+      const code = getOrderCode(o);
+      pushSubpageState("orderDetail");
+      document.getElementById("odHeaderTitle").textContent = `Order ${code}`;
+
+      const due = o.dueAmount !== undefined ? Number(o.dueAmount) : Math.max(0, Number(o.totalAmount || 0) - Number(o.paidAmount || 0));
+
+      document.getElementById("orderDetailBody").innerHTML = `
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <strong style="font-size:17px;color:var(--navy);">${esc(code)}</strong>
+            <span class="status-badge ${statusClass(o.status)}">${esc(o.status)}</span>
+          </div>
+          <p style="font-size:13.5px;line-height:1.7;">
+            <strong>নাম:</strong> ${esc(o.customerName)}<br>
+            <strong>ফোন:</strong> <a href="tel:${esc(o.phone)}" style="color:var(--navy);font-weight:700;">${esc(o.phone)}</a><br>
+            <strong>ঠিকানা:</strong> ${esc(o.address)}<br>
+            <strong>সময়:</strong> ${o.createdAt ? new Date(o.createdAt).toLocaleString("en-GB") : ""}
+          </p>
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            <a href="tel:${esc(o.phone)}" class="btn btn-primary btn-sm">Call</a>
+            <a href="https://wa.me/88${esc((o.phone||'').replace(/^88/,''))}" target="_blank" class="btn btn-success btn-sm">WhatsApp</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>অর্ডার আইটেম</h3></div>
+          ${(o.items || []).map(it => `
+            <div style="display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #f1f5f9;">
+              <img src="${esc(it.image || 'https://placehold.co/60')}" style="width:46px;height:46px;object-fit:contain;border-radius:6px;border:1px solid var(--border);" />
+              <div style="flex:1;font-size:13px;">
+                <strong>${esc(it.name)}</strong>
+                ${it.variant ? `<div style="color:var(--muted);font-size:11.5px;">${esc(it.variant)}</div>` : ''}
+                <div>${it.price}৳ × ${it.qty} = <strong>${it.price * it.qty}৳</strong></div>
+              </div>
+            </div>
+          `).join("")}
+          <div style="margin-top:10px;font-size:13.5px;line-height:1.8;">
+            <div style="display:flex;justify-content:space-between;"><span>ডেলিভারি চার্জ:</span><span>${o.deliveryCharge || 0}৳</span></div>
+            <div style="display:flex;justify-content:space-between;font-weight:800;color:var(--navy);"><span>মোট বিল:</span><span>${o.totalAmount}৳</span></div>
+            <div style="display:flex;justify-content:space-between;color:#16a34a;"><span>অ্যাডভান্স পেইড (${esc(o.paymentMethod || 'COD')}):</span><span>${o.paidAmount || 0}৳</span></div>
+            <div style="display:flex;justify-content:space-between;color:var(--orange);font-weight:800;"><span>কুরিয়ার COD বাকি:</span><span>${due}৳</span></div>
+            ${o.paymentSender || o.paymentTrxId ? `<div style="margin-top:6px;padding:8px;background:#f8fafc;border-radius:8px;font-size:12px;">পেমেন্ট নম্বর: <strong>${esc(o.paymentSender || '-')}</strong> | TrxID: <strong>${esc(o.paymentTrxId || '-')}</strong></div>` : ''}
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>স্ট্যাটাস ও কুরিয়ার কন্ট্রোল</h3></div>
+          <div class="form-group">
+            <label>অর্ডার স্ট্যাটাস পরিবর্তন</label>
+            <div style="display:flex;gap:8px;">
+              <select id="odStatusSel" class="form-control">
+                ${["Pending","Confirmed","Ready for Delivery","Delivered","Returned","Manual","Cancelled"].map(s => `<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join("")}
+              </select>
+              <button class="btn btn-primary" id="odSaveStatusBtn">Save</button>
+            </div>
+          </div>
+
+          ${o.consignmentId ? `
+            <div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;padding:12px;margin-top:10px;">
+              <div style="font-size:13px;line-height:1.7;">
+                <strong>Courier:</strong> ${esc((o.courierProvider || '').toUpperCase())}<br>
+                <strong>Order / Invoice ID:</strong> ${esc(o.invoiceId || code)}<br>
+                <strong>Consignment ID:</strong> ${esc(o.consignmentId)}<br>
+                <strong>Tracking Code:</strong> ${esc(o.trackingCode || '-')}<br>
+                <strong>Live Status:</strong> <span style="color:#5b21b6;font-weight:700;">${esc(o.courierStatus || 'In Transit')}</span>
+              </div>
+              <button class="btn btn-primary btn-sm" id="odRefreshCourierBtn" style="margin-top:8px;">Refresh Live Status</button>
+            </div>
+          ` : `
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;">
+              <button class="btn btn-accent" id="odSendSfBtn">Send to Steadfast</button>
+              <button class="btn btn-success" id="odSendPtBtn">Send to Pathao</button>
+              <button class="btn btn-primary" id="odSendCbBtn">Send to CarryBee</button>
+            </div>
+          `}
+        </div>
+      `;
+
+      document.getElementById("odSaveStatusBtn").onclick = async () => {
+        const st = document.getElementById("odStatusSel").value;
+        await updateDoc(doc(db, "orders", o.id), { status: st, updatedAt: Date.now() });
+        showToast("Status Updated ✓");
+        await loadOrders();
+        openOrderDetail(o.id);
+      };
+
+      document.getElementById("odRefreshCourierBtn")?.addEventListener("click", async () => {
+        try {
+          await syncLiveCourierStatus(o);
+          showToast("Live Status Refreshed ✓");
+          await loadOrders();
+          openOrderDetail(o.id);
+        } catch (err) { showToast(err.message); }
+      });
+
+      const sendOne = async (prov) => {
+        try {
+          showToast(`${prov} এ পাঠানো হচ্ছে...`);
+          await dispatchOrderToCourier(o, prov);
+          showToast("Dispatched ✓");
+          await loadOrders();
+          openOrderDetail(o.id);
+        } catch (err) { showToast("Error: " + err.message); }
+      };
+      document.getElementById("odSendSfBtn")?.addEventListener("click", () => sendOne("steadfast"));
+      document.getElementById("odSendPtBtn")?.addEventListener("click", () => sendOne("pathao"));
+      document.getElementById("odSendCbBtn")?.addEventListener("click", () => sendOne("carrybee"));
+
+      document.getElementById("orderDetailView").classList.add("open");
+    }
+
+    document.getElementById("closeOrderDetailBtn").onclick = () => {
+      document.getElementById("orderDetailView").classList.remove("open");
+      if (history.state?.subview === "orderDetail") history.back();
+    };
+
+    document.getElementById("odPrintBtn").onclick = () => {
+      const o = orders.find(x => x.id === activeOrderId); if (!o) return;
+      const code = getOrderCode(o);
+      const w = window.open("", "_blank", "width=420,height=600");
+      w.document.write(`
+        <div style="font-family:sans-serif;padding:20px;">
+          <h2 style="margin:0;">TH SPORTS BANGLADESH</h2>
+          <p style="font-size:12px;color:#555;">thsports.shop | Order ${esc(code)}</p>
+          <hr/><p><strong>Customer:</strong> ${esc(o.customerName)}<br><strong>Phone:</strong> ${esc(o.phone)}<br><strong>Address:</strong> ${esc(o.address)}</p><hr/>
+          ${(o.items||[]).map(i=>`<p>${esc(i.name)} ${i.variant?`(${esc(i.variant)})`:''} × ${i.qty} — ${i.price*i.qty}৳</p>`).join("")}
+          <hr/><p>Delivery: ${o.deliveryCharge}৳</p>
+          <p>Paid Advance: ${o.paidAmount || 0}৳</p>
+          <h3>COD Due: ${o.dueAmount !== undefined ? o.dueAmount : o.totalAmount}৳</h3>
+        </div>
+      `);
+      w.print();
+    };
+
+    // ================= PRODUCTS LOGIC (SEPARATE ADD/EDIT PAGE) =================
+    async function loadProducts() {
+      const snap = await getDocs(collection(db, "products"));
+      products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      document.getElementById("totalProdCount").textContent = products.length;
+
+      document.getElementById("productsGrid").innerHTML = products.map(p => `
+        <div class="pa-card">
+          <img src="${esc(p.mainImage || 'https://placehold.co/150')}" alt="" />
+          <div class="pa-title">${esc(p.name)}</div>
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;">
+            <strong style="color:var(--orange);">${p.offerPrice || p.regularPrice}৳</strong>
+            <span style="color:var(--muted);">Stock: ${p.stock ?? 0}</span>
+          </div>
+          <div style="display:flex;gap:6px;margin-top:auto;">
+            <button class="btn btn-primary btn-sm" style="flex:1;" onclick="editProduct('${p.id}')">Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p.id}')">Del</button>
+          </div>
+        </div>
+      `).join("") || `<p style="grid-column:1/-1;text-align:center;color:var(--muted);padding:30px;">কোনো প্রোডাক্ট নেই।</p>`;
+    }
+
+    function openProductFormPage(prod = null) {
+      pushSubpageState("productForm");
+      document.getElementById("editProdId").value = prod ? prod.id : "";
+      document.getElementById("prodFormTitle").textContent = prod ? "প্রোডাক্ট এডিট" : "নতুন প্রোডাক্ট যোগ করুন";
+
+      document.getElementById("pCat").value = prod?.categoryId || "";
+      document.getElementById("pName").value = prod?.name || "";
+      document.getElementById("pRegPrice").value = prod?.regularPrice || "";
+      document.getElementById("pOffPrice").value = prod?.offerPrice || "";
+      document.getElementById("pStock").value = prod?.stock ?? 10;
+      document.getElementById("pBestSeller").checked = !!prod?.bestSeller;
+      document.getElementById("pDesc").value = prod?.description || "";
+      document.getElementById("pMainImg").value = prod?.mainImage || "";
+      document.getElementById("pMainPrev").src = prod?.mainImage || "https://placehold.co/80x80/f1f5f9/94a3b8?text=IMG";
+
+      galleryUrls = [...(prod?.gallery || [])];
+      renderGalleryPreview();
+      prodVideoUrls = [...(prod?.videoUrls || [])];
+      renderProdVideos();
+
+      document.getElementById("variantsContainer").innerHTML = "";
+      (prod?.variants || []).forEach(v => addVariantRow(v));
+
+      const rules = prod?.paymentRules || { allowCOD: true, allowAdvanceDelivery: false, allowFixedAdvance: false, fixedAdvanceAmount: 0, allowFullPayment: false, paymentNote: "" };
+      document.getElementById("ruleAllowCOD").checked = rules.allowCOD !== false;
+      document.getElementById("ruleAdvDelivery").checked = !!rules.allowAdvanceDelivery;
+      document.getElementById("ruleFixedAdv").checked = !!rules.allowFixedAdvance;
+      document.getElementById("ruleFixedAmount").value = rules.fixedAdvanceAmount || "";
+      document.getElementById("ruleFullPay").checked = !!rules.allowFullPayment;
+      document.getElementById("ruleNote").value = rules.paymentNote || "";
+
+      document.getElementById("productFormView").classList.add("open");
+      document.getElementById("productFormView").scrollTo(0, 0);
+    }
+
+    document.getElementById("openAddProductBtn").onclick = () => openProductFormPage(null);
+    document.getElementById("closeProductPageBtn").onclick = () => {
+      document.getElementById("productFormView").classList.remove("open");
+      if (history.state?.subview === "productForm") history.back();
+    };
+
+    window.editProduct = (id) => {
+      const p = products.find(x => x.id === id);
+      if (p) openProductFormPage(p);
+    };
+    window.deleteProduct = async (id) => {
+      if (!confirm("প্রোডাক্ট ডিলিট করবেন?")) return;
+      await deleteDoc(doc(db, "products", id)); loadProducts(); showToast("Deleted");
+    };
+
+    document.getElementById("saveProdBtn").onclick = async () => {
+      const categoryId = document.getElementById("pCat").value;
+      const name = document.getElementById("pName").value.trim();
+      const regularPrice = Number(document.getElementById("pRegPrice").value || 0);
+      const offerPrice = Number(document.getElementById("pOffPrice").value || regularPrice);
+      const stock = Number(document.getElementById("pStock").value || 0);
+      const bestSeller = document.getElementById("pBestSeller").checked;
+      const description = document.getElementById("pDesc").value.trim();
+      const mainImage = document.getElementById("pMainImg").value.trim();
+      if (!categoryId || !name || !regularPrice) return showToast("ক্যাটাগরি, নাম এবং দাম দিন");
+
+      const variants = [...document.querySelectorAll(".variant-row")].map(row => ({
+        name: row.querySelector(".v-name").value.trim(),
+        color: row.querySelector(".v-color").value,
+        price: Number(row.querySelector(".v-price").value || offerPrice),
+        stock: Number(row.querySelector(".v-stock").value || 0)
+      })).filter(v => v.name);
+
+      const paymentRules = {
+        allowCOD: document.getElementById("ruleAllowCOD").checked,
+        allowAdvanceDelivery: document.getElementById("ruleAdvDelivery").checked,
+        allowFixedAdvance: document.getElementById("ruleFixedAdv").checked,
+        fixedAdvanceAmount: Number(document.getElementById("ruleFixedAmount").value || 0),
+        allowFullPayment: document.getElementById("ruleFullPay").checked,
+        paymentNote: document.getElementById("ruleNote").value.trim()
+      };
+
+      const payload = {
+        categoryId, name, regularPrice, offerPrice, stock, bestSeller, description,
+        mainImage, gallery: galleryUrls, videoUrls: prodVideoUrls, variants,
+        paymentRules, advanceRequired: !paymentRules.allowCOD, updatedAt: Date.now()
+      };
+
+      const editId = document.getElementById("editProdId").value;
+      if (editId) await updateDoc(doc(db, "products", editId), payload);
+      else { payload.createdAt = Date.now(); payload.reviewCount = 0; payload.avgRating = 5; await addDoc(collection(db, "products"), payload); }
+
+      document.getElementById("productFormView").classList.remove("open");
+      if (history.state?.subview === "productForm") history.back();
+      await loadProducts();
+      showToast("প্রোডাক্ট সেভ হয়েছে ✓");
+    };
+
+    // ================= CATEGORIES, BANNERS, VIDEOS, REVIEWS =================
+    async function loadCategories() {
+      const snap = await getDocs(collection(db, "categories"));
+      categories = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      document.getElementById("pCat").innerHTML = `<option value="">-- ক্যাটাগরি --</option>` +
+        categories.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join("");
+      document.getElementById("catTableWrap").innerHTML = categories.map(c => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">
+          <div style="display:flex;align-items:center;gap:8px;">
+            ${c.image ? `<img src="${esc(c.image)}" style="width:30px;height:30px;object-fit:contain;border-radius:6px;" />` : ''}
+            <strong style="font-size:13.5px;">${esc(c.name)}</strong>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="deleteCategory('${c.id}')">Del</button>
+        </div>
+      `).join("") || `<p style="color:var(--muted);font-size:13px;">কোনো ক্যাটাগরি নেই</p>`;
+    }
+    document.getElementById("saveCatBtn").onclick = async () => {
+      const name = document.getElementById("catName").value.trim(), image = document.getElementById("catImg").value.trim();
+      if (!name) return showToast("নাম লিখুন");
+      await addDoc(collection(db, "categories"), { name, image, createdAt: Date.now() });
+      document.getElementById("catName").value = ""; document.getElementById("catImg").value = "";
+      loadCategories(); showToast("Category Saved ✓");
+    };
+    window.deleteCategory = async (id) => { await deleteDoc(doc(db, "categories", id)); loadCategories(); };
+
+    async function loadBanners() {
+      const snap = await getDocs(collection(db, "banners"));
+      document.getElementById("bannersList").innerHTML = snap.docs.map(d => {
+        const b = d.data();
+        return `<div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fff;">
+          <img src="${esc(b.image)}" style="width:100%;height:110px;object-fit:cover;" />
+          <div style="padding:8px;display:flex;justify-content:space-between;align-items:center;">
+            <span class="status-badge st-Manual">${b.placement === 'promo' ? 'Promo' : 'Hero'}</span>
+            <button class="btn btn-danger btn-sm" onclick="deleteBanner('${d.id}')">Delete</button>
+          </div></div>`;
+      }).join("") || `<p style="color:var(--muted);font-size:13px;">কোনো ব্যানার নেই</p>`;
+    }
+    document.getElementById("saveBannerBtn").onclick = async () => {
+      const placement = document.getElementById("banPlacement").value;
+      const image = document.getElementById("banImg").value.trim();
+      const link = document.getElementById("banLink").value.trim();
+      if (!image) return showToast("ব্যানার ইমেজ দিন");
+      await addDoc(collection(db, "banners"), { placement, image, link, createdAt: Date.now() });
+      document.getElementById("banImg").value = ""; document.getElementById("banLink").value = "";
+      loadBanners(); showToast("Banner Added ✓");
+    };
+    window.deleteBanner = async (id) => { await deleteDoc(doc(db, "banners", id)); loadBanners(); };
+
+    async function loadVideos() {
+      const snap = await getDocs(collection(db, "videos"));
+      const vids = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      document.getElementById("vidCount").textContent = vids.length;
+      document.getElementById("videosList").innerHTML = vids.map(v => `
+        <div style="border:1px solid var(--border);border-radius:10px;padding:10px;background:#fff;">
+          <strong style="font-size:13px;display:block;margin-bottom:4px;">${esc(v.title)}</strong>
+          <small style="color:var(--muted);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:8px;">${esc(v.url)}</small>
+          <button class="btn btn-danger btn-sm" onclick="deleteVideo('${v.id}')">Delete</button>
+        </div>
+      `).join("") || `<p style="color:var(--muted);font-size:13px;">কোনো ভিডিও নেই</p>`;
+    }
+    document.getElementById("saveVideoBtn").onclick = async () => {
+      const title = document.getElementById("vidTitle").value.trim();
+      const url = document.getElementById("vidUrl").value.trim();
+      const thumbnail = document.getElementById("vidThumb").value.trim();
+      if (!title || !url) return showToast("টাইটেল ও ভিডিও লিংক দিন");
+      await addDoc(collection(db, "videos"), { title, url, thumbnail, createdAt: Date.now() });
+      document.getElementById("vidTitle").value = ""; document.getElementById("vidUrl").value = ""; document.getElementById("vidThumb").value = "";
+      loadVideos(); showToast("Video Saved ✓");
+    };
+    window.deleteVideo = async (id) => { await deleteDoc(doc(db, "videos", id)); loadVideos(); };
+
+    async function loadReviews() {
+      const snap = await getDocs(collection(db, "reviews"));
+      const revs = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+      document.getElementById("reviewsList").innerHTML = revs.map(r => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">
+          <div><strong>${esc(r.userName)}</strong> <span style="color:var(--orange);">${"★".repeat(r.rating||5)}</span><div style="color:var(--muted);">${esc(r.comment)}</div></div>
+          <button class="btn btn-danger btn-sm" onclick="deleteReview('${r.id}')">Del</button>
+        </div>
+      `).join("") || `<p style="color:var(--muted);font-size:13px;">কোনো রিভিউ নেই</p>`;
+    }
+    window.deleteReview = async (id) => { await deleteDoc(doc(db, "reviews", id)); loadReviews(); };
+  </script>
+</body>
+</html>
