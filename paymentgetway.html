@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Payment Gateway | TH Sports Bangladesh</title>
+  <link rel="icon" type="image/jpeg" href="https://gcdnb.pbrd.co/images/X64gpxh4sBU_.jpg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { --navy: #162d59; --orange: #f04e23; --bg: #f1f5f9; --border: #e2e8f0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Plus Jakarta Sans', 'Noto Sans Bengali', sans-serif;
+      background: var(--bg); color: #0f172a; min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px;
+    }
+    .pg-card {
+      width: 100%; max-width: 410px; background: #fff; border-radius: 18px;
+      border: 1px solid var(--border); box-shadow: 0 12px 35px rgba(15,23,42,0.08);
+      overflow: hidden; animation: fadeUp 0.28s ease;
+    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .pg-head {
+      padding: 18px 20px; color: #fff; display: flex; justify-content: space-between; align-items: center;
+    }
+    .pg-bkash { background: #e2136e; }
+    .pg-nagad { background: #f7941d; }
+    .pg-rocket { background: #8c3494; }
+
+    .pg-body { padding: 20px; }
+    .num-box {
+      background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 12px;
+      padding: 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
+    }
+    .copy-btn {
+      background: var(--navy); color: #fff; border: none; padding: 7px 14px;
+      border-radius: 8px; font-size: 12.5px; font-weight: 700; cursor: pointer;
+    }
+    .form-group { margin-bottom: 13px; }
+    .form-group label { display: block; font-size: 12.5px; font-weight: 600; color: #334155; margin-bottom: 5px; }
+    .form-control {
+      width: 100%; padding: 10px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px;
+      font-family: inherit; font-size: 14px; outline: none;
+    }
+    .form-control:focus { border-color: var(--navy); }
+    .submit-btn {
+      width: 100%; padding: 12px; border: none; border-radius: 10px;
+      background: var(--navy); color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 4px;
+    }
+    .submit-btn:disabled { opacity: 0.6; }
+    .back-link {
+      display: block; text-align: center; margin-top: 12px; font-size: 13px; color: #64748b; text-decoration: none; font-weight: 600;
+    }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #0f172a; color: #fff; padding: 9px 18px; border-radius: 99px; font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <div class="pg-card" id="pgCard">
+    <div style="padding:40px;text-align:center;color:#64748b;font-weight:600;">Loading...</div>
+  </div>
+
+  <div class="toast" id="toastBox"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getFirestore, doc, getDoc, collection, addDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC7qQLrHIDOOxxSUcDsjR5EcHO4-0mByNQ",
+      authDomain: "th-sports-afd52.firebaseapp.com",
+      projectId: "th-sports-afd52",
+      storageBucket: "th-sports-afd52.firebasestorage.app",
+      messagingSenderId: "479595748038",
+      appId: "1:479595748038:web:0a0f2389d2b9f13aa215c7",
+      measurementId: "G-H8L744Y578"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const params = new URLSearchParams(location.search);
+
+    const toBn = (n) => String(n).replace(/\d/g, d => "০১২৩৪৫৬৭৮৯"[d]);
+    const esc = (s) => String(s || "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    function showToast(msg) { const t = document.getElementById("toastBox"); t.textContent = msg; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2000); }
+
+    async function generateNextOrderCode() {
+      try {
+        const counterRef = doc(db, "counters", "orders");
+        const nextSeq = await runTransaction(db, async (tx) => {
+          const snap = await tx.get(counterRef);
+          const next = snap.exists() ? Number(snap.data().seq || 0) + 1 : 1;
+          tx.set(counterRef, { seq: next });
+          return next;
+        });
+        return { orderSeq: nextSeq, orderCode: "TH" + String(nextSeq).padStart(2, "0") };
+      } catch (e) {
+        const fallback = Math.floor(100 + Math.random() * 900);
+        return { orderSeq: fallback, orderCode: "TH" + fallback };
+      }
+    }
+
+    async function init() {
+      const pending = JSON.parse(sessionStorage.getItem("th_pending_order") || "null");
+      if (!pending) {
+        location.href = "index.html";
+        return;
+      }
+
+      const gwKey = params.get("gw") || pending.gateway || "bkash";
+      const gwTitle = gwKey === "bkash" ? "bKash" : gwKey === "nagad" ? "Nagad" : "Rocket";
+
+      const snap = await getDoc(doc(db, "settings", "store"));
+      const gateways = snap.exists() ? (snap.data().gateways || {}) : {};
+      const gwData = gateways[gwKey] || {};
+      const payNumber = gwData.number || "নম্বর সেট করা নেই";
+      const accType = gwData.type || "Personal";
+      const instruction = gwData.instruction || "Send Money করুন";
+
+      document.getElementById("pgCard").innerHTML = `
+        <div class="pg-head pg-${esc(gwKey)}">
+          <div>
+            <strong style="font-size:19px;">${gwTitle}</strong>
+            <span style="display:block;font-size:12px;opacity:0.9;">${esc(accType)} • ${esc(instruction)}</span>
+          </div>
+          <div style="text-align:right;">
+            <small style="display:block;font-size:11px;opacity:0.9;">পেমেন্ট পরিমাণ</small>
+            <strong style="font-size:21px;">${toBn(pending.payAmount)}৳</strong>
+          </div>
+        </div>
+
+        <div class="pg-body">
+          <div class="num-box">
+            <div>
+              <small style="display:block;font-size:11px;color:#64748b;">${gwTitle} ${esc(accType)} Number</small>
+              <strong style="font-size:18px;letter-spacing:0.5px;color:#0f172a;" id="gwNumTxt">${esc(payNumber)}</strong>
+            </div>
+            <button type="button" class="copy-btn" id="copyNumBtn">Copy</button>
+          </div>
+
+          <div class="form-group">
+            <label>যে নম্বর থেকে টাকা পাঠিয়েছেন *</label>
+            <input type="tel" id="senderPhone" class="form-control" placeholder="01XXXXXXXXX" />
+          </div>
+
+          <div class="form-group">
+            <label>Transaction ID (ঐচ্ছিক)</label>
+            <input type="text" id="trxIdInput" class="form-control" placeholder="TrxID (থাকলে দিন)" />
+          </div>
+
+          <button class="submit-btn" id="submitPaymentBtn">সাবমিট ও অর্ডার কনফার্ম</button>
+          <a href="javascript:history.back()" class="back-link">← ফিরে যান</a>
+        </div>
+      `;
+
+      document.getElementById("copyNumBtn").onclick = async () => {
+        try {
+          await navigator.clipboard.writeText(payNumber);
+          document.getElementById("copyNumBtn").textContent = "Copied ✓";
+          showToast("নম্বর কপি হয়েছে ✓");
+          setTimeout(() => document.getElementById("copyNumBtn").textContent = "Copy", 1800);
+        } catch (e) { showToast("Copy failed"); }
+      };
+
+      document.getElementById("submitPaymentBtn").onclick = async () => {
+        const sender = document.getElementById("senderPhone").value.trim();
+        const trx = document.getElementById("trxIdInput").value.trim();
+        if (!sender && !trx) {
+          showToast("টাকা পাঠানোর নম্বর অথবা Transaction ID দিন");
+          return;
+        }
+
+        const btn = document.getElementById("submitPaymentBtn");
+        btn.disabled = true; btn.textContent = "যাচাই হচ্ছে...";
+
+        try {
+          const { orderSeq, orderCode } = await generateNextOrderCode();
+          const paymentStatus = pending.dueAmount === 0 ? "Paid" : "Partial";
+
+          await addDoc(collection(db, "orders"), {
+            orderSeq, orderCode,
+            customerName: pending.customerName,
+            phone: pending.phone,
+            address: pending.address,
+            deliveryZone: pending.deliveryZone,
+            items: pending.items,
+            subtotal: pending.subtotal,
+            deliveryCharge: pending.deliveryCharge,
+            totalAmount: pending.totalAmount,
+            paidAmount: pending.payAmount,
+            dueAmount: pending.dueAmount,
+            paymentMethod: gwTitle,
+            paymentPlan: pending.paymentPlan,
+            paymentStatus,
+            paymentSender: sender,
+            paymentTrxId: trx,
+            status: "Pending",
+            createdAt: Date.now()
+          });
+
+          if (pending.isCart) localStorage.removeItem("th_cart");
+          sessionStorage.removeItem("th_pending_order");
+          sessionStorage.setItem("th_confirmed_order", JSON.stringify({
+            orderCode,
+            customerName: pending.customerName,
+            totalAmount: pending.totalAmount,
+            paidAmount: pending.payAmount,
+            dueAmount: pending.dueAmount,
+            paymentMethod: gwTitle
+          }));
+
+          location.href = "checkout.html?confirmed=1";
+        } catch (err) {
+          showToast("সাবমিট ব্যর্থ হয়েছে, আবার চেষ্টা করুন");
+          btn.disabled = false; btn.textContent = "সাবমিট ও অর্ডার কনফার্ম";
+        }
+      };
+    }
+
+    init();
+  </script>
+</body>
+</html>
