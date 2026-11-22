@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>Checkout | TH Sports Bangladesh</title>
+  <link rel="icon" type="image/jpeg" href="https://gcdnb.pbrd.co/images/X64gpxh4sBU_.jpg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    :root {
+      --navy: #162d59;
+      --orange: #f04e23;
+      --bg: #fafafa;
+      --surface: #ffffff;
+      --border: #e5e7eb;
+      --text: #111827;
+      --muted: #6b7280;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { overflow-x: hidden; max-width: 100%; }
+    body {
+      font-family: 'Plus Jakarta Sans', 'Noto Sans Bengali', sans-serif;
+      background: var(--bg); color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh; display: flex; flex-direction: column;
+    }
+    a { text-decoration: none; color: inherit; }
+    button, input, select { font-family: inherit; }
+
+    /* Top Header (Screenshot Style) */
+    .top-header {
+      background: #ffffff; border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 50; height: 64px; padding: 0 18px;
+    }
+    .header-inner {
+      max-width: 680px; margin: 0 auto; height: 100%;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .brand-logo { display: flex; align-items: center; gap: 9px; }
+    .logo-circle {
+      width: 38px; height: 38px; border-radius: 50%; overflow: hidden;
+      border: 1.6px solid var(--orange); background: var(--navy);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .logo-circle img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .brand-text-col { display: flex; flex-direction: column; line-height: 1; }
+    .brand-title { font-size: 16px; font-weight: 800; font-style: italic; letter-spacing: -0.4px; color: var(--navy); }
+    .brand-sub { font-size: 7.5px; font-weight: 700; letter-spacing: 2.5px; color: var(--orange); text-align: right; margin-top: 2px; }
+
+    .back-shop-link {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-size: 14px; font-weight: 600; color: var(--text);
+      transition: opacity 0.15s;
+    }
+    .back-shop-link:hover { opacity: 0.7; }
+
+    /* Main Checkout Container */
+    .main-wrap {
+      width: 100%; max-width: 640px; margin: 0 auto;
+      padding: 26px 16px 46px; flex: 1;
+    }
+
+    .eyebrow {
+      font-size: 11.5px; font-weight: 700; letter-spacing: 1.8px;
+      color: var(--muted); text-transform: uppercase; margin-bottom: 6px;
+    }
+    .page-title {
+      font-size: 32px; font-weight: 800; color: #000;
+      letter-spacing: -0.6px; line-height: 1.15; margin-bottom: 8px;
+    }
+    .page-subtitle {
+      font-size: 14.5px; color: var(--muted); line-height: 1.5; margin-bottom: 24px;
+    }
+
+    /* Order Summary Card (Screenshot 1 & 2) */
+    .summary-card {
+      background: #ffffff; border: 1px solid var(--border);
+      border-radius: 4px; margin-bottom: 20px; overflow: hidden;
+    }
+    .summary-header {
+      background: #f3f3f3; padding: 18px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; user-select: none;
+    }
+    .summary-eyebrow {
+      font-size: 11px; font-weight: 700; letter-spacing: 1.3px;
+      color: var(--muted); text-transform: uppercase; margin-bottom: 4px;
+    }
+    .summary-heading { font-size: 19px; font-weight: 700; color: #000; }
+    .summary-top-right { display: flex; align-items: center; gap: 12px; }
+    .summary-top-total { font-size: 16px; font-weight: 700; color: #000; }
+    .chevron-icon { transition: transform 0.2s ease; color: #111827; }
+    .summary-card.collapsed .chevron-icon { transform: rotate(180deg); }
+    .summary-card.collapsed .summary-body { display: none; }
+
+    .summary-body { padding: 8px 20px 20px; }
+    .order-item {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 16px 0; border-bottom: 1px solid #eeeeee;
+    }
+    .item-thumb-wrap {
+      position: relative; width: 68px; height: 68px; flex-shrink: 0;
+      border: 1px solid #eeeeee; background: #fff; border-radius: 2px;
+    }
+    .item-thumb-wrap img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .item-qty-badge {
+      position: absolute; top: -8px; right: -8px;
+      background: #111111; color: #ffffff;
+      font-size: 11px; font-weight: 700; min-width: 22px; height: 22px;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0 5px;
+    }
+    .item-info { flex: 1; min-width: 0; }
+    .item-name-row {
+      display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;
+    }
+    .item-name {
+      font-size: 15px; font-weight: 600; color: #111111; line-height: 1.35;
+    }
+    .item-remove-btn {
+      background: none; border: none; color: #9ca3af; font-size: 18px;
+      line-height: 1; cursor: pointer; padding: 0 2px;
+    }
+    .item-remove-btn:hover { color: #dc2626; }
+
+    .item-controls-row {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px;
+    }
+    .var-select {
+      padding: 4px 8px; border: 1px solid #d1d5db; border-radius: 3px;
+      font-size: 12.5px; color: #111827; background: #fafafa; outline: none; max-width: 160px;
+    }
+    .qty-stepper {
+      display: inline-flex; align-items: center; border: 1px solid #d1d5db;
+      border-radius: 3px; background: #fff;
+    }
+    .qty-btn {
+      width: 24px; height: 24px; border: none; background: transparent;
+      color: #111827; font-size: 14px; font-weight: 600; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .qty-btn:hover { background: #f3f4f6; }
+    .qty-num {
+      min-width: 24px; text-align: center; font-size: 12.5px; font-weight: 600;
+    }
+    .item-price {
+      font-size: 15.5px; font-weight: 700; color: #000; margin-top: 9px;
+    }
+
+    /* Coupon Section (Screenshot 1 & 2) */
+    .coupon-block {
+      padding: 18px 0 16px; border-bottom: 1px solid #eeeeee;
+    }
+    .coupon-label {
+      display: block; font-size: 14.5px; font-weight: 600; color: #111; margin-bottom: 10px;
+    }
+    .coupon-row { display: flex; gap: 10px; }
+    .coupon-input {
+      flex: 1; height: 46px; padding: 0 14px; border: 1px solid #d1d5db;
+      border-radius: 4px; font-size: 14.5px; outline: none; color: #111;
+    }
+    .coupon-input:focus { border-color: #111; }
+    .coupon-apply-btn {
+      height: 46px; padding: 0 24px; border: none; border-radius: 4px;
+      background: #808080; color: #fff; font-size: 14.5px; font-weight: 600;
+      cursor: pointer; transition: background 0.15s;
+    }
+    .coupon-apply-btn.ready { background: #111111; }
+    .coupon-msg { font-size: 12.5px; margin-top: 8px; font-weight: 600; }
+    .coupon-msg.err { color: #dc2626; }
+    .coupon-msg.ok { color: #16a34a; display: flex; align-items: center; justify-content: space-between; }
+    .coupon-remove {
+      background: none; border: none; color: #dc2626; font-size: 12.5px;
+      font-weight: 600; cursor: pointer; text-decoration: underline;
+    }
+
+    /* Totals Breakdown (Screenshot 2) */
+    .totals-block { padding-top: 14px; }
+    .tot-line {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 14.5px; color: var(--muted); padding: 5px 0;
+    }
+    .tot-line strong { color: #111; font-weight: 600; }
+    .tot-line.discount strong { color: #16a34a; }
+    .tot-final {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 18px; font-weight: 700; color: #000;
+      border-top: 1px solid #eeeeee; margin-top: 12px; padding-top: 14px;
+    }
+    .summary-note-box {
+      background: #f5f5f5; padding: 12px 14px; margin-top: 16px;
+      font-size: 13px; color: #4b5563; line-height: 1.5; border-radius: 2px;
+    }
+
+    /* Step Cards 01, 02, 03 (Screenshot 2, 3, 4) */
+    .step-card {
+      background: #ffffff; border: 1px solid var(--border);
+      border-radius: 4px; padding: 24px 20px; margin-bottom: 18px;
+    }
+    .step-head { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 20px; }
+    .step-num {
+      width: 40px; height: 40px; background: #000000; color: #ffffff;
+      font-size: 13.5px; font-weight: 700; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .step-title { font-size: 19px; font-weight: 700; color: #000; margin-bottom: 4px; }
+    .step-sub { font-size: 14px; color: var(--muted); line-height: 1.45; }
+
+    .field-group { margin-bottom: 16px; }
+    .field-group:last-child { margin-bottom: 0; }
+    .field-label {
+      display: block; font-size: 14px; font-weight: 600; color: #111; margin-bottom: 7px;
+    }
+    .field-control {
+      width: 100%; height: 48px; padding: 0 14px; border: 1px solid #d1d5db;
+      border-radius: 4px; font-size: 15px; color: #111; background: #fff; outline: none;
+    }
+    .field-control:focus { border-color: #111; }
+
+    .country-box {
+      height: 48px; padding: 0 14px; border: 1px solid #d1d5db; border-radius: 4px;
+      display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 500;
+      background: #fff; color: #111;
+    }
+    .phone-wrap {
+      height: 48px; border: 1px solid #d1d5db; border-radius: 4px;
+      display: flex; align-items: center; overflow: hidden; background: #fff;
+    }
+    .phone-wrap:focus-within { border-color: #111; }
+    .phone-prefix {
+      display: flex; align-items: center; gap: 8px; padding: 0 12px;
+      border-right: 1px solid #e5e7eb; height: 28px; font-size: 14.5px; font-weight: 600; color: #111;
+      flex-shrink: 0;
+    }
+    .phone-input {
+      border: none; outline: none; flex: 1; height: 100%; padding: 0 12px;
+      font-size: 15px; color: #111; min-width: 0;
+    }
+    .flag-svg { width: 24px; height: 16px; border-radius: 2px; flex-shrink: 0; display: block; }
+
+    .save-box {
+      background: #f5f5f5; border: 1px solid #eeeeee; border-radius: 3px;
+      padding: 14px; display: flex; align-items: flex-start; gap: 12px;
+      margin-top: 18px; cursor: pointer;
+    }
+    .save-box input { width: 18px; height: 18px; margin-top: 2px; accent-color: #111; cursor: pointer; }
+    .save-title { font-size: 14px; font-weight: 600; color: #111; margin-bottom: 3px; }
+    .save-sub { font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+
+    /* Radio Option Cards (Shipping & Payment - Screenshot 4) */
+    .radio-card {
+      background: #f3f3f3; border: 1px solid transparent; border-radius: 2px;
+      padding: 16px; margin-bottom: 12px; display: flex; align-items: center;
+      justify-content: space-between; gap: 12px; cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .radio-card:last-child { margin-bottom: 0; }
+    .radio-card.active { border-color: #111111; background: #f3f3f3; }
+    .radio-left { display: flex; align-items: center; gap: 14px; }
+    .radio-circle {
+      width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid #9ca3af;
+      background: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .radio-card.active .radio-circle { border-color: #111; }
+    .radio-card.active .radio-circle::after {
+      content: ""; width: 10px; height: 10px; border-radius: 50%; background: #111;
+    }
+    .radio-title { font-size: 15px; font-weight: 600; color: #111; }
+    .radio-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .radio-price { font-size: 15.5px; font-weight: 700; color: #111; white-space: nowrap; }
+
+    /* Gateways Grid when Online Advance Selected */
+    .gw-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 8px; margin-top: 14px;
+    }
+    .gw-card {
+      border: 1.5px solid #d1d5db; border-radius: 4px; padding: 10px;
+      text-align: center; cursor: pointer; background: #fff;
+    }
+    .gw-card.active { border-color: #111; background: #f9fafb; }
+    .gw-badge { font-size: 14px; font-weight: 800; display: block; }
+    .gw-bkash { color: #e2136e; } .gw-nagad { color: #f7941d; } .gw-rocket { color: #8c3494; }
+
+    /* Place Order Box (Screenshot 4) */
+    .place-order-card {
+      background: #ffffff; border: 1px solid var(--border);
+      border-radius: 4px; padding: 20px;
+    }
+    .place-btn-wrap { position: relative; }
+    .place-order-btn {
+      width: 100%; height: 50px; background: #000000; color: #ffffff;
+      border: none; font-size: 16px; font-weight: 700; cursor: pointer;
+      box-shadow: 5px 5px 0px #5e8c2a;
+      transition: transform 0.12s, box-shadow 0.12s;
+    }
+    .place-order-btn:active { transform: translate(2px, 2px); box-shadow: 3px 3px 0px #5e8c2a; }
+    .place-order-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .place-note {
+      text-align: center; font-size: 13px; color: var(--muted);
+      line-height: 1.5; margin-top: 16px;
+    }
+
+    .empty-cart-box {
+      background: #fff; border: 1px solid var(--border); border-radius: 4px;
+      padding: 48px 20px; text-align: center;
+    }
+    .swal2-popup { border-radius: 10px !important; font-family: 'Plus Jakarta Sans', 'Noto Sans Bengali', sans-serif !important; }
+  </style>
+</head>
+<body>
+
+  <header class="top-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand-logo">
+        <div class="logo-circle">
+          <img src="https://gcdnb.pbrd.co/images/X64gpxh4sBU_.jpg" alt="TH Sports" />
+        </div>
+        <div class="brand-text-col">
+          <span class="brand-title">TH SPORTS</span>
+          <span class="brand-sub">BANGLADESH</span>
+        </div>
+      </a>
+      <a href="index.html" class="back-shop-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Back to shop
+      </a>
+    </div>
+  </header>
+
+  <main class="main-wrap" id="cartRoot">
+    <div style="padding:60px 0;text-align:center;color:var(--muted);font-size:14px;">Loading...</div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getFirestore, doc, getDoc, collection, getDocs, addDoc, setDoc, deleteDoc, runTransaction, query, where, increment } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC7qQLrHIDOOxxSUcDsjR5EcHO4-0mByNQ",
+      authDomain: "th-sports-afd52.firebaseapp.com",
+      projectId: "th-sports-afd52",
+      storageBucket: "th-sports-afd52.firebasestorage.app",
+      messagingSenderId: "479595748038",
+      appId: "1:479595748038:web:0a0f2389d2b9f13aa215c7",
+      measurementId: "G-H8L744Y578"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const esc = (s) => String(s || "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const fmtTk = (n) => "Tk " + Number(n || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    function popAlert(msg, type = "warning") {
+      if (window.Swal) Swal.fire({ icon: type, title: msg, confirmButtonText: "OK", confirmButtonColor: "#111111" });
+      else alert(msg);
+    }
+
+    // Real-time Visitor & Presence Tracker
+    (async function initPresence() {
+      try {
+        let sid = sessionStorage.getItem("th_sid");
+        if (!sid) {
+          sid = "v_" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+          sessionStorage.setItem("th_sid", sid);
+        }
+        let country = sessionStorage.getItem("th_country");
+        if (!country) {
+          try {
+            const ctrl = new AbortController();
+            setTimeout(() => ctrl.abort(), 2500);
+            const r = await fetch("https://api.country.is/", { signal: ctrl.signal });
+            const d = await r.json();
+            country = d?.country || "BD";
+          } catch {
+            country = Intl.DateTimeFormat().resolvedOptions().timeZone === "Asia/Dhaka" ? "BD" : "Other";
+          }
+          sessionStorage.setItem("th_country", country);
+        }
+        if (!sessionStorage.getItem("th_visited")) {
+          sessionStorage.setItem("th_visited", "1");
+          setDoc(doc(db, "analytics", "summary"), {
+            totalVisitors: increment(1),
+            countries: { [country]: increment(1) }
+          }, { merge: true }).catch(() => {});
+        }
+        const ping = () => setDoc(doc(db, "presence", sid), { page: "Cart", country, lastSeen: Date.now() }).catch(() => {});
+        ping();
+        setInterval(ping, 25000);
+        window.addEventListener("pagehide", () => { deleteDoc(doc(db, "presence", sid)).catch(() => {}); });
+      } catch (e) {}
+    })();
+
+    const BD_DISTRICTS = [
+      "ঈশ্বরদী (পাবনা)", "পাবনা", "ঢাকা", "গাজীপুর", "নারায়ণগঞ্জ", "চট্টগ্রাম", "রাজশাহী", "খুলনা", "সিলেট", "রংপুর", "বরিশাল", "ময়মনসিংহ",
+      "কক্সবাজার", "কুমিল্লা", "ব্রাহ্মণবাড়িয়া", "চাঁদপুর", "ফেনী", "লক্ষ্মীপুর", "নোয়াখালী", "বান্দরবান", "খাগড়াছড়ি", "রাঙ্গামাটি",
+      "নরসিংদী", "মানিকগঞ্জ", "মুন্সীগঞ্জ", "ফরিদপুর", "গোপালগঞ্জ", "মাদারীপুর", "রাজবাড়ী", "শরীয়তপুর", "কিশোরগঞ্জ", "টাঙ্গাইল",
+      "সিরাজগঞ্জ", "বগুড়া", "নাটোর", "নওগাঁ", "চাঁপাইনবাবগঞ্জ", "জয়পুরহাট",
+      "যশোর", "সাতক্ষীরা", "বাগেরহাট", "ঝিনাইদহ", "মাগুরা", "নড়াইল", "কুষ্টিয়া", "চুয়াডাঙ্গা", "মেহেরপুর",
+      "মৌলভীবাজার", "হবিগঞ্জ", "সুনামগঞ্জ",
+      "দিনাজপুর", "গাইবান্ধা", "কুড়িগ্রাম", "লালমনিরহাট", "নীলফামারী", "পঞ্চগড়", "ঠাকুরগাঁও",
+      "ভোলা", "পটুয়াখালী", "পিরোজপুর", "ঝালকাঠি", "বরগুনা",
+      "জামালপুর", "নেত্রকোণা", "শেরপুর"
+    ];
+
+    function detectZone(city, address) {
+      const c = (city || "").toLowerCase();
+      const a = (address || "").toLowerCase();
+      const keys = ["ঈশ্বরদী", "ishwardi", "ishurdi", "পাকশী", "paksey", "রূপপুর", "rooppur", "দাশুড়িয়া", "dasuria", "মুলাডুলি", "muladuli"];
+      if (keys.some(k => c.includes(k) || a.includes(k))) return "ishwardi";
+      return "outside";
+    }
+
+    function normalizeOptions(p) {
+      if (Array.isArray(p.variants) && p.variants.length) return p.variants;
+      if (Array.isArray(p.sizes) && p.sizes.length) {
+        return p.sizes.map(s => typeof s === "object"
+          ? { name: s.size || s.name, price: s.price || p.offerPrice || p.regularPrice, stock: s.stock ?? p.stock ?? 10 }
+          : { name: String(s), price: p.offerPrice || p.regularPrice, stock: p.stock ?? 10 }
+        );
+      }
+      return [];
+    }
+
+    let storeSettings = {
+      ishwardiCharge: 60,
+      outsideIshwardiCharge: 120,
+      gateways: {
+        bkash: { enabled: true, number: "", type: "Personal", instruction: "Send Money" },
+        nagad: { enabled: false, number: "", type: "Personal", instruction: "Send Money" },
+        rocket: { enabled: false, number: "", type: "Personal", instruction: "Send Money" }
+      }
+    };
+
+    let cartItems = [];
+    let appliedCoupon = null;
+    let shippingZone = "ishwardi";
+    let selectedPlanId = null;
+    let selectedGateway = "";
+
+    const bdFlagSvg = `<svg class="flag-svg" viewBox="0 0 24 16"><rect width="24" height="16" fill="#006a4e"/><circle cx="10.5" cy="8" r="4.8" fill="#f42a41"/></svg>`;
+
+    async function loadStoreSettings() {
+      try {
+        const s = await getDoc(doc(db, "settings", "store"));
+        if (s.exists()) {
+          const d = s.data();
+          storeSettings = {
+            ...storeSettings, ...d,
+            ishwardiCharge: d.ishwardiCharge ?? d.insideDhaka ?? 60,
+            outsideIshwardiCharge: d.outsideIshwardiCharge ?? d.outsideDhaka ?? 120,
+            gateways: { ...storeSettings.gateways, ...(d.gateways || {}) }
+          };
+        }
+      } catch (e) {}
+    }
+
+    async function hydrateCartProducts() {
+      const rawCart = JSON.parse(localStorage.getItem("th_cart") || "[]");
+      if (!rawCart.length) { cartItems = []; return; }
+
+      const uniqueIds = [...new Set(rawCart.map(c => c.id).filter(Boolean))];
+      const prodMap = {};
+      await Promise.all(uniqueIds.map(async (pid) => {
+        try {
+          const snap = await getDoc(doc(db, "products", pid));
+          if (snap.exists()) prodMap[pid] = { id: snap.id, ...snap.data() };
+        } catch (e) {}
+      }));
+
+      cartItems = rawCart.map(c => {
+        const p = prodMap[c.id];
+        const opts = p ? normalizeOptions(p) : (c.availableVariants || []);
+        const basePrice = p ? Number(p.offerPrice || p.regularPrice || c.price) : Number(c.price || 0);
+        let activePrice = Number(c.price || basePrice);
+        if (opts.length && c.variant) {
+          const matchedOpt = opts.find(v => v.name === c.variant);
+          if (matchedOpt && matchedOpt.price) activePrice = Number(matchedOpt.price);
+        }
+        return {
+          ...c,
+          price: activePrice,
+          basePrice,
+          image: c.image || p?.mainImage || "",
+          paymentRules: p?.paymentRules || c.paymentRules || null,
+          availableVariants: opts
+        };
+      });
+    }
+
+    function saveCartToLocal() {
+      const clean = cartItems.map(c => ({
+        id: c.id, name: c.name, price: c.price, image: c.image,
+        variant: c.variant || "", qty: c.qty, paymentRules: c.paymentRules || null
+      }));
+      localStorage.setItem("th_cart", JSON.stringify(clean));
+    }
+
+    function getCouponDiscount(subtotal) {
+      if (!appliedCoupon) return 0;
+      if (subtotal < Number(appliedCoupon.minOrder || 0)) return 0;
+
+      let eligible = subtotal;
+      if (appliedCoupon.scope === "product" && Array.isArray(appliedCoupon.productIds)) {
+        eligible = cartItems
+          .filter(i => appliedCoupon.productIds.includes(i.id))
+          .reduce((s, i) => s + Number(i.price) * Number(i.qty), 0);
+      }
+      if (eligible <= 0) return 0;
+
+      if (appliedCoupon.discountType === "percent") {
+        return Math.min(eligible, Math.round((eligible * Number(appliedCoupon.discountValue || 0)) / 100));
+      }
+      return Math.min(eligible, Number(appliedCoupon.discountValue || 0));
+    }
+
+    function buildPaymentPlans(items, netSubtotal, deliveryCharge) {
+      const total = netSubtotal + deliveryCharge;
+      let allowCOD = true, allowAdvDel = false, allowFixedAdv = false, fixedAmount = 0, allowFull = false;
+
+      if (items.length === 1 && items[0].paymentRules) {
+        const r = items[0].paymentRules;
+        allowCOD = r.allowCOD !== false;
+        allowAdvDel = !!r.allowAdvanceDelivery;
+        allowFixedAdv = !!r.allowFixedAdvance && Number(r.fixedAdvanceAmount) > 0;
+        fixedAmount = Number(r.fixedAdvanceAmount || 0);
+        allowFull = !!r.allowFullPayment;
+      } else if (items.length > 1) {
+        allowCOD = items.every(i => !i.paymentRules || i.paymentRules.allowCOD !== false);
+        allowAdvDel = items.some(i => i.paymentRules?.allowAdvanceDelivery);
+        allowFixedAdv = items.some(i => i.paymentRules?.allowFixedAdvance && Number(i.paymentRules?.fixedAdvanceAmount) > 0);
+        fixedAmount = items.reduce((mx, i) => Math.max(mx, Number(i.paymentRules?.fixedAdvanceAmount || 0)), 0);
+        allowFull = items.some(i => i.paymentRules?.allowFullPayment);
+      }
+
+      const plans = [];
+      if (allowCOD) plans.push({ id: "cod", title: "Cash on delivery", sub: "Pay when your order arrives", payNow: 0, due: total, isOnline: false });
+      if (allowAdvDel) plans.push({ id: "advance_delivery", title: "Delivery charge advance", sub: "Pay delivery fee now, rest on delivery", payNow: deliveryCharge, due: netSubtotal, isOnline: true });
+      if (allowFixedAdv && fixedAmount > 0) {
+        const adv = Math.min(total, fixedAmount);
+        plans.push({ id: "fixed_advance", title: "Advance payment", sub: "Pay partial advance now", payNow: adv, due: total - adv, isOnline: true });
+      }
+      if (allowFull) plans.push({ id: "full", title: "Full online payment", sub: "Pay total amount now", payNow: total, due: 0, isOnline: true });
+      if (!plans.length) plans.push({ id: "advance_delivery", title: "Delivery charge advance", sub: "Pay delivery fee now", payNow: deliveryCharge, due: netSubtotal, isOnline: true });
+      return plans;
+    }
+
+    async function generateNextOrderCode() {
+      try {
+        const counterRef = doc(db, "counters", "orders");
+        const nextSeq = await runTransaction(db, async (tx) => {
+          const snap = await tx.get(counterRef);
+          const next = snap.exists() ? Number(snap.data().seq || 0) + 1 : 1;
+          tx.set(counterRef, { seq: next });
+          return next;
+        });
+        return { orderSeq: nextSeq, orderCode: "TH" + String(nextSeq).padStart(2, "0") };
+      } catch (e) {
+        const fallback = Math.floor(100 + Math.random() * 900);
+        return { orderSeq: fallback, orderCode: "TH" + fallback };
+      }
+    }
+
+    function renderCheckoutPage() {
+      const root = document.getElementById("cartRoot");
+      if (!cartItems.length) {
+        root.innerHTML = `
+          <div class="empty-cart-box">
+            <h2 style="font-size:22px;margin-bottom:8px;">Your cart is empty</h2>
+            <p style="font-size:14px;color:var(--muted);margin-bottom:20px;">Add items to continue to checkout.</p>
+            <a href="index.html" class="place-order-btn" style="display:inline-flex;align-items:center;justify-content:center;padding:0 28px;width:auto;">Back to shop</a>
+          </div>
+        `;
+        return;
+      }
+
+      const savedDetails = JSON.parse(localStorage.getItem("th_saved_delivery") || "null") || {};
+      if (savedDetails.city || savedDetails.address) {
+        shippingZone = detectZone(savedDetails.city, savedDetails.address);
+      }
+
+      const enabledGateways = Object.entries(storeSettings.gateways || {}).filter(([, g]) => g && g.enabled && g.number);
+      if (!selectedGateway && enabledGateways.length) selectedGateway = enabledGateways[0][0];
+
+      root.innerHTML = `
+        <div class="eyebrow">TH SPORTS BD</div>
+        <h1 class="page-title">Checkout</h1>
+        <p class="page-subtitle">Review your delivery, payment, and order details.</p>
+
+        <!-- Order Summary -->
+        <section class="summary-card" id="summaryCard">
+          <div class="summary-header" id="summaryToggle">
+            <div>
+              <div class="summary-eyebrow" id="sumEyebrow"></div>
+              <div class="summary-heading">Order summary</div>
+            </div>
+            <div class="summary-top-right">
+              <span class="summary-top-total" id="sumTopTotal"></span>
+              <svg class="chevron-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg>
+            </div>
+          </div>
+
+          <div class="summary-body">
+            <div id="cartItemsList"></div>
+
+            <div class="coupon-block">
+              <label class="coupon-label" for="couponInput">Coupon code</label>
+              <div class="coupon-row">
+                <input type="text" id="couponInput" class="coupon-input" placeholder="Enter coupon code" value="${esc(appliedCoupon?.code || '')}" />
+                <button type="button" class="coupon-apply-btn ${appliedCoupon ? 'ready' : ''}" id="applyCouponBtn">Apply</button>
+              </div>
+              <div id="couponMsgWrap"></div>
+            </div>
+
+            <div class="totals-block">
+              <div class="tot-line"><span>Subtotal</span><strong id="valSub"></strong></div>
+              <div class="tot-line discount" id="rowDiscount" style="display:none;"><span id="lblDiscount">Discount</span><strong id="valDiscount"></strong></div>
+              <div class="tot-line"><span>Delivery</span><strong id="valDel"></strong></div>
+              <div class="tot-final"><span>Total</span><span id="valTotal"></span></div>
+              <div class="summary-note-box">Delivery is included in the total shown here. Review your choices before placing an order.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 01 Delivery Details -->
+        <section class="step-card">
+          <div class="step-head">
+            <div class="step-num">01</div>
+            <div>
+              <div class="step-title">Delivery details</div>
+              <div class="step-sub">Tell us where your order should arrive.</div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Country / region</label>
+            <div class="country-box">${bdFlagSvg} <span>Bangladesh</span></div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="fName">Full name *</label>
+            <input type="text" id="fName" class="field-control" placeholder="Your full name" value="${esc(savedDetails.name || '')}" />
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="fAddress">Street address *</label>
+            <input type="text" id="fAddress" class="field-control" placeholder="House, road, area" value="${esc(savedDetails.address || '')}" />
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="fCity">City *</label>
+            <select id="fCity" class="field-control">
+              <option value="">City</option>
+              ${BD_DISTRICTS.map(d => `<option value="${esc(d)}" ${savedDetails.city === d ? 'selected' : ''}>${esc(d)}</option>`).join("")}
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="fPhone">Phone number *</label>
+            <div class="phone-wrap">
+              <div class="phone-prefix">${bdFlagSvg} <span>+880</span></div>
+              <input type="tel" id="fPhone" class="phone-input" placeholder="1XXXXXXXXX" value="${esc(savedDetails.phone || '')}" />
+            </div>
+          </div>
+
+          <label class="save-box">
+            <input type="checkbox" id="fSaveDetails" ${savedDetails.name ? 'checked' : ''} />
+            <div>
+              <div class="save-title">Save these details for next time</div>
+              <div class="save-sub">Only saved in this browser when you choose this option.</div>
+            </div>
+          </label>
+        </section>
+
+        <!-- 02 Shipping Method -->
+        <section class="step-card">
+          <div class="step-head">
+            <div class="step-num">02</div>
+            <div>
+              <div class="step-title">Shipping method</div>
+              <div class="step-sub">Choose the area that matches your address.</div>
+            </div>
+          </div>
+          <div id="shippingOptions"></div>
+        </section>
+
+        <!-- 03 Payment Method -->
+        <section class="step-card">
+          <div class="step-head">
+            <div class="step-num">03</div>
+            <div>
+              <div class="step-title">Payment method</div>
+              <div class="step-sub">Pick what feels right for you.</div>
+            </div>
+          </div>
+          <div id="paymentPlansWrap"></div>
+          <div id="gatewayWrap" style="display:none;">
+            <div class="gw-grid" id="gatewayGrid">
+              ${enabledGateways.map(([k, g]) => `
+                <div class="gw-card ${selectedGateway === k ? 'active' : ''}" data-gw="${k}">
+                  <span class="gw-badge gw-${k}">${k === 'bkash' ? 'bKash' : k === 'nagad' ? 'Nagad' : 'Rocket'}</span>
+                  <small style="font-size:11px;color:var(--muted);">${esc(g.type)}</small>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        </section>
+
+        <!-- Place Order -->
+        <section class="place-order-card">
+          <div class="place-btn-wrap">
+            <button type="button" class="place-order-btn" id="placeOrderBtn">Place Order</button>
+          </div>
+          <p class="place-note" id="placeNote">Pay when your order arrives. The final total is confirmed by our order service.</p>
+        </section>
+      `;
+
+      document.getElementById("summaryToggle").onclick = () => {
+        document.getElementById("summaryCard").classList.toggle("collapsed");
+      };
+
+      const couponInput = document.getElementById("couponInput");
+      const applyBtn = document.getElementById("applyCouponBtn");
+      couponInput.oninput = () => {
+        applyBtn.classList.toggle("ready", couponInput.value.trim().length > 0);
+      };
+
+      applyBtn.onclick = async () => {
+        const code = couponInput.value.trim().toUpperCase();
+        if (!code) return;
+        applyBtn.disabled = true; applyBtn.textContent = "...";
+        const msgWrap = document.getElementById("couponMsgWrap");
+        try {
+          const snap = await getDocs(query(collection(db, "coupons"), where("code", "==", code)));
+          if (snap.empty) {
+            appliedCoupon = null;
+            msgWrap.innerHTML = `<div class="coupon-msg err">Invalid coupon code</div>`;
+            recalcTotals();
+            return;
+          }
+          const c = { id: snap.docs[0].id, ...snap.docs[0].data() };
+          if (c.active === false) {
+            appliedCoupon = null;
+            msgWrap.innerHTML = `<div class="coupon-msg err">Coupon expired</div>`;
+            recalcTotals();
+            return;
+          }
+          const sub = cartItems.reduce((s, i) => s + Number(i.price) * Number(i.qty), 0);
+          if (sub < Number(c.minOrder || 0)) {
+            appliedCoupon = null;
+            msgWrap.innerHTML = `<div class="coupon-msg err">Minimum order ${fmtTk(c.minOrder)} required</div>`;
+            recalcTotals();
+            return;
+          }
+          if (c.scope === "product" && Array.isArray(c.productIds)) {
+            const hasMatch = cartItems.some(i => c.productIds.includes(i.id));
+            if (!hasMatch) {
+              appliedCoupon = null;
+              msgWrap.innerHTML = `<div class="coupon-msg err">Not applicable for items in cart</div>`;
+              recalcTotals();
+              return;
+            }
+          }
+          appliedCoupon = c;
+          recalcTotals();
+        } catch (err) {
+          msgWrap.innerHTML = `<div class="coupon-msg err">Could not verify coupon</div>`;
+        } finally {
+          applyBtn.disabled = false; applyBtn.textContent = "Apply";
+        }
+      };
+
+      const syncAddressZone = () => {
+        const city = document.getElementById("fCity").value;
+        const addr = document.getElementById("fAddress").value;
+        shippingZone = detectZone(city, addr);
+        recalcTotals();
+      };
+      document.getElementById("fCity").onchange = syncAddressZone;
+      document.getElementById("fAddress").oninput = syncAddressZone;
+
+      document.getElementById("gatewayGrid")?.addEventListener("click", (e) => {
+        const card = e.target.closest(".gw-card"); if (!card) return;
+        selectedGateway = card.dataset.gw;
+        document.querySelectorAll(".gw-card").forEach(x => x.classList.toggle("active", x === card));
+      });
+
+      document.getElementById("placeOrderBtn").onclick = submitOrder;
+
+      renderCartItemsList();
+      recalcTotals();
+    }
+
+    function renderCartItemsList() {
+      const listEl = document.getElementById("cartItemsList");
+      const totalItems = cartItems.reduce((s, i) => s + Number(i.qty || 1), 0);
+      document.getElementById("sumEyebrow").textContent = `YOUR ORDER • ${totalItems} ${totalItems === 1 ? 'ITEM' : 'ITEMS'}`;
+
+      listEl.innerHTML = cartItems.map((it, idx) => {
+        const opts = it.availableVariants || [];
+        return `
+          <div class="order-item">
+            <div class="item-thumb-wrap">
+              <img src="${esc(it.image || 'https://placehold.co/100')}" alt="${esc(it.name)}" />
+              <span class="item-qty-badge">${it.qty}</span>
+            </div>
+            <div class="item-info">
+              <div class="item-name-row">
+                <div class="item-name">${esc(it.name)}</div>
+                <button type="button" class="item-remove-btn" data-remove="${idx}" aria-label="Remove">×</button>
+              </div>
+
+              <div class="item-controls-row">
+                ${opts.length ? `
+                  <select class="var-select" data-vidx="${idx}">
+                    ${opts.map(v => `<option value="${esc(v.name)}" ${it.variant === v.name ? 'selected' : ''}>${esc(v.name)}</option>`).join("")}
+                  </select>
+                ` : (it.variant ? `<span style="font-size:12.5px;color:var(--muted);">${esc(it.variant)}</span>` : '')}
+
+                <div class="qty-stepper">
+                  <button type="button" class="qty-btn" data-dec="${idx}">−</button>
+                  <span class="qty-num">${it.qty}</span>
+                  <button type="button" class="qty-btn" data-inc="${idx}">+</button>
+                </div>
+              </div>
+
+              <div class="item-price">${fmtTk(Number(it.price) * Number(it.qty))}</div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      listEl.querySelectorAll("[data-inc]").forEach(btn => {
+        btn.onclick = () => {
+          const i = Number(btn.dataset.inc);
+          cartItems[i].qty += 1;
+          saveCartToLocal();
+          renderCartItemsList();
+          recalcTotals();
+        };
+      });
+      listEl.querySelectorAll("[data-dec]").forEach(btn => {
+        btn.onclick = () => {
+          const i = Number(btn.dataset.dec);
+          if (cartItems[i].qty > 1) {
+            cartItems[i].qty -= 1;
+            saveCartToLocal();
+            renderCartItemsList();
+            recalcTotals();
+          }
+        };
+      });
+      listEl.querySelectorAll("[data-remove]").forEach(btn => {
+        btn.onclick = () => {
+          const i = Number(btn.dataset.remove);
+          cartItems.splice(i, 1);
+          saveCartToLocal();
+          renderCheckoutPage();
+        };
+      });
+      listEl.querySelectorAll(".var-select").forEach(sel => {
+        sel.onchange = () => {
+          const i = Number(sel.dataset.vidx);
+          const chosen = cartItems[i].availableVariants.find(v => v.name === sel.value);
+          cartItems[i].variant = sel.value;
+          if (chosen && chosen.price) cartItems[i].price = Number(chosen.price);
+          saveCartToLocal();
+          renderCartItemsList();
+          recalcTotals();
+        };
+      });
+    }
+
+    function recalcTotals() {
+      if (!cartItems.length) return;
+      const subtotal = cartItems.reduce((s, i) => s + Number(i.price) * Number(i.qty), 0);
+      let discount = getCouponDiscount(subtotal);
+
+      const msgWrap = document.getElementById("couponMsgWrap");
+      if (appliedCoupon && discount > 0) {
+        msgWrap.innerHTML = `
+          <div class="coupon-msg ok">
+            <span>Applied: ${esc(appliedCoupon.code)} (-${fmtTk(discount)})</span>
+            <button type="button" class="coupon-remove" id="removeCouponBtn">Remove</button>
+          </div>
+        `;
+        document.getElementById("removeCouponBtn").onclick = () => {
+          appliedCoupon = null;
+          document.getElementById("couponInput").value = "";
+          msgWrap.innerHTML = "";
+          recalcTotals();
+        };
+      } else if (appliedCoupon && subtotal < Number(appliedCoupon.minOrder || 0)) {
+        appliedCoupon = null;
+        msgWrap.innerHTML = "";
+      }
+
+      const netSubtotal = Math.max(0, subtotal - discount);
+      const delCharge = shippingZone === "ishwardi"
+        ? Number(storeSettings.ishwardiCharge)
+        : Number(storeSettings.outsideIshwardiCharge);
+      const total = netSubtotal + delCharge;
+
+      document.getElementById("valSub").textContent = fmtTk(subtotal);
+      const rowDisc = document.getElementById("rowDiscount");
+      if (discount > 0) {
+        rowDisc.style.display = "flex";
+        document.getElementById("lblDiscount").textContent = `Discount (${appliedCoupon.code})`;
+        document.getElementById("valDiscount").textContent = "-" + fmtTk(discount);
+      } else {
+        rowDisc.style.display = "none";
+      }
+      document.getElementById("valDel").textContent = fmtTk(delCharge);
+      document.getElementById("valTotal").textContent = fmtTk(total);
+      document.getElementById("sumTopTotal").textContent = fmtTk(total);
+
+      // Shipping Radio Cards
+      document.getElementById("shippingOptions").innerHTML = `
+        <div class="radio-card ${shippingZone === 'ishwardi' ? 'active' : ''}" data-zone="ishwardi">
+          <div class="radio-left">
+            <div class="radio-circle"></div>
+            <div>
+              <div class="radio-title">Inside Ishwardi</div>
+              <div class="radio-sub">For addresses within Ishwardi</div>
+            </div>
+          </div>
+          <span class="radio-price">${fmtTk(storeSettings.ishwardiCharge)}</span>
+        </div>
+        <div class="radio-card ${shippingZone === 'outside' ? 'active' : ''}" data-zone="outside">
+          <div class="radio-left">
+            <div class="radio-circle"></div>
+            <div>
+              <div class="radio-title">Outside Ishwardi</div>
+              <div class="radio-sub">For the rest of Bangladesh</div>
+            </div>
+          </div>
+          <span class="radio-price">${fmtTk(storeSettings.outsideIshwardiCharge)}</span>
+        </div>
+      `;
+      document.querySelectorAll("#shippingOptions .radio-card").forEach(card => {
+        card.onclick = () => { shippingZone = card.dataset.zone; recalcTotals(); };
+      });
+
+      // Payment Plans
+      const plans = buildPaymentPlans(cartItems, netSubtotal, delCharge);
+      if (!selectedPlanId || !plans.some(p => p.id === selectedPlanId)) selectedPlanId = plans[0].id;
+      const activePlan = plans.find(p => p.id === selectedPlanId);
+
+      document.getElementById("paymentPlansWrap").innerHTML = plans.map(pl => `
+        <div class="radio-card ${pl.id === selectedPlanId ? 'active' : ''}" data-plan="${pl.id}">
+          <div class="radio-left">
+            <div class="radio-circle"></div>
+            <div>
+              <div class="radio-title">${esc(pl.title)}</div>
+              <div class="radio-sub">${esc(pl.sub)}</div>
+            </div>
+          </div>
+          ${pl.payNow > 0 ? `<span class="radio-price">${fmtTk(pl.payNow)}</span>` : ''}
+        </div>
+      `).join("");
+
+      document.querySelectorAll("#paymentPlansWrap .radio-card").forEach(card => {
+        card.onclick = () => { selectedPlanId = card.dataset.plan; recalcTotals(); };
+      });
+
+      document.getElementById("gatewayWrap").style.display = activePlan.isOnline ? "block" : "none";
+      const placeBtn = document.getElementById("placeOrderBtn");
+      const placeNote = document.getElementById("placeNote");
+
+      if (activePlan.isOnline) {
+        placeBtn.textContent = `Pay & Place Order (${fmtTk(activePlan.payNow)})`;
+        placeNote.textContent = "Complete advance payment on the next step to confirm your order.";
+      } else {
+        placeBtn.textContent = "Place Order";
+        placeNote.textContent = "Pay when your order arrives. The final total is confirmed by our order service.";
+      }
+    }
+
+    async function submitOrder() {
+      const customerName = document.getElementById("fName").value.trim();
+      const rawAddress = document.getElementById("fAddress").value.trim();
+      const city = document.getElementById("fCity").value.trim();
+      const rawPhone = document.getElementById("fPhone").value.trim().replace(/[\s-]/g, "");
+
+      if (!customerName || !rawAddress || !city || !rawPhone) {
+        return popAlert("Please fill in all required delivery fields", "warning");
+      }
+
+      let cleanPhone = rawPhone.replace(/^\+?880?/, "");
+      if (cleanPhone.length === 10 && cleanPhone.startsWith("1")) cleanPhone = "0" + cleanPhone;
+      if (!/^01[3-9]\d{8}$/.test(cleanPhone)) {
+        return popAlert("Please enter a valid Bangladesh phone number", "error");
+      }
+
+      if (document.getElementById("fSaveDetails").checked) {
+        localStorage.setItem("th_saved_delivery", JSON.stringify({
+          name: customerName, address: rawAddress, city, phone: cleanPhone.slice(1)
+        }));
+      } else {
+        localStorage.removeItem("th_saved_delivery");
+      }
+
+      const fullAddress = `${rawAddress}, ${city}`;
+      const subtotal = cartItems.reduce((s, i) => s + Number(i.price) * Number(i.qty), 0);
+      const discountAmount = getCouponDiscount(subtotal);
+      const netSubtotal = Math.max(0, subtotal - discountAmount);
+      const delCharge = shippingZone === "ishwardi"
+        ? Number(storeSettings.ishwardiCharge)
+        : Number(storeSettings.outsideIshwardiCharge);
+      const totalAmount = netSubtotal + delCharge;
+
+      const plans = buildPaymentPlans(cartItems, netSubtotal, delCharge);
+      const activePlan = plans.find(p => p.id === selectedPlanId);
+      const cleanItems = cartItems.map(i => ({
+        productId: i.id, name: i.name, variant: i.variant || "",
+        price: Number(i.price), qty: Number(i.qty), image: i.image || ""
+      }));
+
+      if (activePlan.isOnline) {
+        if (!selectedGateway) return popAlert("Please select a payment gateway", "warning");
+        sessionStorage.setItem("th_pending_order", JSON.stringify({
+          isCart: true, customerName, phone: cleanPhone, district: city,
+          address: fullAddress, deliveryZone: shippingZone,
+          items: cleanItems, subtotal, discountAmount, couponCode: appliedCoupon?.code || "",
+          deliveryCharge: delCharge, totalAmount,
+          paymentPlan: activePlan.id, payAmount: activePlan.payNow, dueAmount: activePlan.due,
+          gateway: selectedGateway
+        }));
+        location.href = `paymentgetway.html?gw=${encodeURIComponent(selectedGateway)}&amount=${activePlan.payNow}`;
+        return;
+      }
+
+      const btn = document.getElementById("placeOrderBtn");
+      btn.disabled = true; btn.textContent = "Processing...";
+      try {
+        const { orderSeq, orderCode } = await generateNextOrderCode();
+        await addDoc(collection(db, "orders"), {
+          orderSeq, orderCode, customerName, phone: cleanPhone, district: city,
+          address: fullAddress, deliveryZone: shippingZone,
+          items: cleanItems, subtotal, discountAmount, couponCode: appliedCoupon?.code || "",
+          deliveryCharge: delCharge, totalAmount,
+          paidAmount: 0, dueAmount: totalAmount,
+          paymentMethod: "COD", paymentPlan: "cod", paymentStatus: "Unpaid",
+          status: "Pending", createdAt: Date.now()
+        });
+        localStorage.removeItem("th_cart");
+        sessionStorage.setItem("th_confirmed_order", JSON.stringify({
+          orderCode, customerName, totalAmount, paidAmount: 0, dueAmount: totalAmount, paymentMethod: "COD"
+        }));
+        location.href = "checkout.html?confirmed=1";
+      } catch (err) {
+        popAlert("Failed to place order, please try again", "error");
+        btn.disabled = false; btn.textContent = "Place Order";
+      }
+    }
+
+    (async () => {
+      await Promise.all([loadStoreSettings(), hydrateCartProducts()]);
+      renderCheckoutPage();
+    })();
+  </script>
+</body>
+</html>
