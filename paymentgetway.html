@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Payment | TH Sports Bangladesh</title>
+  <link rel="icon" type="image/jpeg" href="https://gcdnb.pbrd.co/images/X64gpxh4sBU_.jpg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,600;0,700;0,800;1,800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    :root {
+      --navy: #162d59;
+      --orange: #f04e23;
+      --bg: #f6f8fc;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Plus Jakarta Sans', 'Noto Sans Bengali', sans-serif;
+      background: var(--bg); color: var(--text); min-height: 100vh;
+      display: flex; flex-direction: column; -webkit-font-smoothing: antialiased;
+    }
+    a { text-decoration: none; color: inherit; }
+    button, input { font-family: inherit; }
+
+    /* Minimal Brand Header */
+    .header {
+      background: rgba(255,255,255,0.97); backdrop-filter: blur(12px);
+      height: 60px; border-bottom: 1px solid var(--border); padding: 0 16px;
+      position: sticky; top: 0; z-index: 50;
+    }
+    .header-inner {
+      max-width: 900px; margin: 0 auto; height: 100%;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .back-btn {
+      width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border);
+      background: #fff; color: var(--navy); display: inline-flex; align-items: center;
+      justify-content: center; cursor: pointer; transition: all 0.15s;
+    }
+    .back-btn:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
+    .brand-logo { display: flex; align-items: center; gap: 9px; }
+    .logo-circle {
+      width: 36px; height: 36px; border-radius: 50%; overflow: hidden;
+      border: 1.6px solid var(--orange); background: var(--navy); flex-shrink: 0;
+    }
+    .logo-circle img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .brand-text-col { display: flex; flex-direction: column; line-height: 1; }
+    .brand-title { font-size: 17.5px; font-weight: 800; font-style: italic; letter-spacing: -0.5px; color: var(--navy); }
+    .brand-sub { font-size: 7.5px; font-weight: 700; letter-spacing: 2.6px; color: var(--orange); text-align: right; margin-top: 2px; }
+
+    /* Main Stage */
+    .main-stage {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      padding: 20px 16px 32px;
+    }
+    .pg-card {
+      width: 100%; max-width: 420px; background: #fff; border-radius: 18px;
+      border: 1px solid var(--border); box-shadow: 0 14px 36px rgba(15, 23, 42, 0.08);
+      overflow: hidden; animation: fadeUp 0.25s ease;
+    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .pg-head {
+      padding: 18px 20px; color: #fff;
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    }
+    .pg-bkash { background: linear-gradient(135deg, #e2136e 0%, #c10d5c 100%); }
+    .pg-nagad { background: linear-gradient(135deg, #f7941d 0%, #e07b09 100%); }
+    .pg-rocket { background: linear-gradient(135deg, #8c3494 0%, #6c2173 100%); }
+
+    .gw-title-row { display: flex; align-items: center; gap: 8px; }
+    .gw-name { font-size: 20px; font-weight: 800; letter-spacing: -0.3px; }
+    .gw-type-pill {
+      background: rgba(255,255,255,0.22); font-size: 11px; font-weight: 700;
+      padding: 2px 9px; border-radius: 99px;
+    }
+    .gw-inst { font-size: 12px; opacity: 0.92; margin-top: 3px; }
+    .gw-amount { font-size: 23px; font-weight: 800; white-space: nowrap; }
+
+    .pg-body { padding: 20px; }
+
+    .num-box {
+      background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 12px;
+      padding: 13px 14px; display: flex; justify-content: space-between; align-items: center;
+      gap: 10px; margin-bottom: 18px; cursor: pointer; transition: border-color 0.15s;
+    }
+    .num-box:hover { border-color: var(--navy); }
+    .num-val { font-size: 19px; font-weight: 800; letter-spacing: 0.6px; color: var(--navy); }
+    .copy-btn {
+      background: var(--navy); color: #fff; border: none; padding: 8px 14px;
+      border-radius: 9px; font-size: 12.5px; font-weight: 700; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0;
+      transition: background 0.2s, transform 0.12s;
+    }
+    .copy-btn:active { transform: scale(0.95); }
+    .copy-btn.copied { background: #16a34a; }
+
+    .form-group { margin-bottom: 13px; }
+    .form-group label { display: block; font-size: 12.5px; font-weight: 700; color: #334155; margin-bottom: 5px; }
+    .form-control {
+      width: 100%; padding: 11px 13px; border: 1.5px solid #cbd5e1; border-radius: 10px;
+      font-size: 14px; outline: none; background: #fff; transition: border-color 0.2s;
+    }
+    .form-control:focus { border-color: var(--navy); }
+
+    .submit-btn {
+      width: 100%; padding: 13px; border: none; border-radius: 10px;
+      background: var(--orange); color: #fff; font-size: 15px; font-weight: 800;
+      cursor: pointer; margin-top: 6px; transition: opacity 0.15s, transform 0.12s;
+    }
+    .submit-btn:active { transform: scale(0.99); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .pg-footer {
+      text-align: center; padding: 14px 16px; font-size: 11.5px; color: var(--muted);
+    }
+    .pg-footer a { color: var(--orange); font-weight: 700; }
+
+    .swal2-popup { border-radius: 18px !important; font-family: 'Plus Jakarta Sans', 'Noto Sans Bengali', sans-serif !important; }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <button class="back-btn" onclick="history.back()" aria-label="Back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <a href="index.html" class="brand-logo">
+        <div class="logo-circle">
+          <img src="https://gcdnb.pbrd.co/images/X64gpxh4sBU_.jpg" alt="TH Sports" />
+        </div>
+        <div class="brand-text-col">
+          <span class="brand-title">TH SPORTS</span>
+          <span class="brand-sub">BANGLADESH</span>
+        </div>
+      </a>
+    </div>
+  </header>
+
+  <main class="main-stage">
+    <div class="pg-card" id="pgCard">
+      <div style="padding:48px 20px;text-align:center;color:var(--muted);font-size:14px;font-weight:600;">Loading...</div>
+    </div>
+  </main>
+
+  <footer class="pg-footer">
+    © 2026 TH Sports (thsports.shop) • Developed by <a href="https://wa.me/message/HG3CUSUPMOWQE1" target="_blank" rel="noopener noreferrer">tioDisk</a>
+  </footer>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getFirestore, doc, getDoc, collection, addDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC7qQLrHIDOOxxSUcDsjR5EcHO4-0mByNQ",
+      authDomain: "th-sports-afd52.firebaseapp.com",
+      projectId: "th-sports-afd52",
+      storageBucket: "th-sports-afd52.firebasestorage.app",
+      messagingSenderId: "479595748038",
+      appId: "1:479595748038:web:0a0f2389d2b9f13aa215c7",
+      measurementId: "G-H8L744Y578"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const params = new URLSearchParams(location.search);
+
+    const toBn = (n) => String(n).replace(/\d/g, d => "০১২৩৪৫৬৭৮৯"[d]);
+    const esc = (s) => String(s || "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+    function popAlert(msg, type = "warning") {
+      if (window.Swal) {
+        Swal.fire({ icon: type, title: msg, confirmButtonText: "ঠিক আছে", confirmButtonColor: "#162d59" });
+      } else {
+        alert(msg);
+      }
+    }
+
+    // Reliable Copy (Works on Android/iOS, WebViews, Chrome & Desktop)
+    async function copyTextSafe(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        try {
+          await navigator.clipboard.writeText(text);
+          return true;
+        } catch {}
+      }
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.cssText = "position:fixed;top:-9999px;left:-9999px;opacity:0;";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      ta.setSelectionRange(0, text.length);
+      let ok = false;
+      try { ok = document.execCommand("copy"); } catch {}
+      document.body.removeChild(ta);
+      return ok;
+    }
+
+    async function generateNextOrderCode() {
+      try {
+        const counterRef = doc(db, "counters", "orders");
+        const nextSeq = await runTransaction(db, async (tx) => {
+          const snap = await tx.get(counterRef);
+          const next = snap.exists() ? Number(snap.data().seq || 0) + 1 : 1;
+          tx.set(counterRef, { seq: next });
+          return next;
+        });
+        return { orderSeq: nextSeq, orderCode: "TH" + String(nextSeq).padStart(2, "0") };
+      } catch (e) {
+        const fallback = Math.floor(100 + Math.random() * 900);
+        return { orderSeq: fallback, orderCode: "TH" + fallback };
+      }
+    }
+
+    async function init() {
+      const pending = JSON.parse(sessionStorage.getItem("th_pending_order") || "null");
+      if (!pending) {
+        location.href = "index.html";
+        return;
+      }
+
+      const gwKey = params.get("gw") || pending.gateway || "bkash";
+      const gwTitle = gwKey === "bkash" ? "bKash" : gwKey === "nagad" ? "Nagad" : "Rocket";
+
+      const snap = await getDoc(doc(db, "settings", "store"));
+      const gateways = snap.exists() ? (snap.data().gateways || {}) : {};
+      const gwData = gateways[gwKey] || {};
+      const payNumber = (gwData.number || "").trim();
+      const accType = gwData.type || "Personal";
+      const instruction = gwData.instruction || "Send Money";
+
+      document.getElementById("pgCard").innerHTML = `
+        <div class="pg-head pg-${esc(gwKey)}">
+          <div>
+            <div class="gw-title-row">
+              <strong class="gw-name">${gwTitle}</strong>
+              <span class="gw-type-pill">${esc(accType)}</span>
+            </div>
+            <div class="gw-inst">${esc(instruction)}</div>
+          </div>
+          <strong class="gw-amount">${toBn(pending.payAmount)}৳</strong>
+        </div>
+
+        <div class="pg-body">
+          <div class="num-box" id="copyBox">
+            <strong class="num-val" id="gwNumTxt">${esc(payNumber || "নম্বর সেট করা নেই")}</strong>
+            ${payNumber ? `
+              <button type="button" class="copy-btn" id="copyNumBtn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                <span>Copy</span>
+              </button>
+            ` : ''}
+          </div>
+
+          <div class="form-group">
+            <label>সেন্ডার নম্বর *</label>
+            <input type="tel" id="senderPhone" class="form-control" placeholder="01XXXXXXXXX" />
+          </div>
+
+          <div class="form-group">
+            <label>TrxID</label>
+            <input type="text" id="trxIdInput" class="form-control" placeholder="Transaction ID (ঐচ্ছিক)" />
+          </div>
+
+          <button class="submit-btn" id="submitPaymentBtn">অর্ডার কনফার্ম করুন</button>
+        </div>
+      `;
+
+      const handleCopy = async () => {
+        if (!payNumber) return;
+        const ok = await copyTextSafe(payNumber);
+        const btn = document.getElementById("copyNumBtn");
+        if (ok && btn) {
+          btn.classList.add("copied");
+          btn.querySelector("span").textContent = "Copied ✓";
+          if (window.Swal) {
+            Swal.fire({
+              toast: true, position: "top", icon: "success",
+              title: "নম্বর কপি হয়েছে!", showConfirmButton: false, timer: 1400
+            });
+          }
+          setTimeout(() => {
+            btn.classList.remove("copied");
+            btn.querySelector("span").textContent = "Copy";
+          }, 1800);
+        } else {
+          popAlert("নম্বরটি সিলেক্ট করে কপি করুন: " + payNumber, "info");
+        }
+      };
+
+      document.getElementById("copyBox").onclick = handleCopy;
+      document.getElementById("copyNumBtn")?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        handleCopy();
+      });
+
+      document.getElementById("submitPaymentBtn").onclick = async () => {
+        const sender = document.getElementById("senderPhone").value.trim().replace(/[\s-]/g, "");
+        const trx = document.getElementById("trxIdInput").value.trim();
+
+        if (!sender && !trx) {
+          return popAlert("সেন্ডার নম্বর অথবা TrxID দিন", "warning");
+        }
+        if (sender && !/^(\+?88)?01[3-9]\d{8}$/.test(sender)) {
+          return popAlert("সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন", "error");
+        }
+
+        const btn = document.getElementById("submitPaymentBtn");
+        btn.disabled = true; btn.textContent = "অপেক্ষা করুন...";
+
+        try {
+          const { orderSeq, orderCode } = await generateNextOrderCode();
+          const paymentStatus = pending.dueAmount === 0 ? "Paid" : "Partial";
+
+          await addDoc(collection(db, "orders"), {
+            orderSeq, orderCode,
+            customerName: pending.customerName,
+            phone: pending.phone,
+            district: pending.district || "",
+            address: pending.address,
+            deliveryZone: pending.deliveryZone,
+            items: pending.items,
+            subtotal: pending.subtotal,
+            discountAmount: pending.discountAmount || 0,
+            couponCode: pending.couponCode || "",
+            deliveryCharge: pending.deliveryCharge,
+            totalAmount: pending.totalAmount,
+            paidAmount: pending.payAmount,
+            dueAmount: pending.dueAmount,
+            paymentMethod: gwTitle,
+            paymentPlan: pending.paymentPlan,
+            paymentStatus,
+            paymentSender: sender,
+            paymentTrxId: trx,
+            status: "Pending",
+            createdAt: Date.now()
+          });
+
+          if (pending.isCart) localStorage.removeItem("th_cart");
+          sessionStorage.removeItem("th_pending_order");
+          sessionStorage.setItem("th_confirmed_order", JSON.stringify({
+            orderCode,
+            customerName: pending.customerName,
+            totalAmount: pending.totalAmount,
+            paidAmount: pending.payAmount,
+            dueAmount: pending.dueAmount,
+            paymentMethod: gwTitle
+          }));
+
+          location.href = "checkout.html?confirmed=1";
+        } catch (err) {
+          popAlert("অর্ডার সাবমিট ব্যর্থ হয়েছে, আবার চেষ্টা করুন", "error");
+          btn.disabled = false; btn.textContent = "অর্ডার কনফার্ম করুন";
+        }
+      };
+    }
+
+    init();
+  </script>
+</body>
+</html>
